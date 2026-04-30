@@ -15,4 +15,4 @@ The canonical agent brief for this project is **[AGENTS.md](AGENTS.md)**. Read t
 
 ## Memory
 
-If you maintain a project memory file across sessions, record the current `TRIBE_NAME`, active sprint, and which story slugs are in progress. This reduces re-orientation time at the start of each session.
+If you maintain a project memory file across sessions, record the current `Tribe X`, active sprint, and which story slugs are in progress. This reduces re-orientation time at the start of each session.

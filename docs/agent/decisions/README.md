@@ -1,6 +1,6 @@
 # Architectural Decision Records
 
-ADRs for TRIBE-X record significant architectural decisions: what was decided, why, and consequences. ADRs are numbered sequentially and never edited once Accepted. To revise an accepted decision, create a new ADR and mark the old one "Superseded by NNNN".
+ADRs for Tribe_X record significant architectural decisions: what was decided, why, and consequences. ADRs are numbered sequentially and never edited once Accepted. To revise an accepted decision, create a new ADR and mark the old one "Superseded by NNNN".
 
 Use `docs/agent/decisions/_template.md` for new ADRs.
 

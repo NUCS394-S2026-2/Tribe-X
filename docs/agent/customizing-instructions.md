@@ -4,16 +4,19 @@ All `ALL_CAPS` placeholders that should be replaced before agents can be fully u
 
 ## Global Setup Tokens
 
-| Token                         | Description                      |
-| ----------------------------- | -------------------------------- |
-| `TRIBE-X`                     | Your tribe/team name             |
-| `Robert`                      | Client the app is built for      |
-| `WORKING_GROUP_ARCH_DESIGN`   | Architecture & design guild name |
-| `WORKING_GROUP_DEV_PRACTICES` | Dev practices guild name         |
+| Token                   | Description                      |
+| ----------------------- | -------------------------------- |
+| `Tribe_X`               | Your tribe/team name             |
+| `Robert`                | Client the app is built for      |
+| `Tribe_X_Arch_Design`   | Architecture & design guild name |
+| `Tribe_X_Dev_Practices` | Dev practices guild name         |
 
 ## Architecture Tokens
 
 Recommend describing the architecture and ownership in `docs/agent/architecture.md`
+- Frontend Ownership: Client Application (Web/Mobile) built in React, utilizing a Firebase Hook for communication.
+- Backend Ownership: Managed via Firebase Functions which acts as the orchestration layer.
+- Logic Ownership: An Agent Interface handles the "Internal Logic," coordinating between multiple external services:
 
 ## Data Model Tokens
 
@@ -78,19 +81,19 @@ Design your testing strategy and fill in doc/testing.md.
 Find all occurrences of a token:
 
 ```bash
-grep -r "TRIBE-X" docs/
+grep -r "Tribe_X" docs/
 ```
 
 Replace in all markdown files (macOS):
 
 ```bash
-find docs -name "*.md" -exec sed -i '' 's/TRIBE-X/YourTribeName/g' {} +
+find docs -name "*.md" -exec sed -i '' 's/Tribe_X/YourTribeName/g' {} +
 ```
 
 Replace in all markdown files (Linux):
 
 ```bash
-find docs -name "*.md" | xargs sed -i 's/TRIBE-X/YourTribeName/g'
+find docs -name "*.md" | xargs sed -i 's/Tribe_X/YourTribeName/g'
 ```
 
 List all remaining unreplaced tokens:
@@ -104,14 +107,14 @@ grep -roh '[A-Z_]\{5,\}' docs/agent/ | sort -u
 Find all occurrences of a token:
 
 ```powershell
-Get-ChildItem -Path docs -Recurse -Filter "*.md" | Select-String "TRIBE-X"
+Get-ChildItem -Path docs -Recurse -Filter "*.md" | Select-String "Tribe_X"
 ```
 
 Replace a token in all markdown files:
 
 ```powershell
 Get-ChildItem -Path docs -Recurse -Filter "*.md" | ForEach-Object {
-  (Get-Content $_.FullName) -replace 'TRIBE-X', 'YourTribeName' | Set-Content $_.FullName
+  (Get-Content $_.FullName) -replace 'Tribe_X', 'YourTribeName' | Set-Content $_.FullName
 }
 ```
 

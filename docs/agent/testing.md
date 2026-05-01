@@ -1,6 +1,6 @@
 # Testing Guide
 
-Owned by **WORKING_GROUP_DEV_PRACTICES**. Read alongside the story spec's test plan before writing any test.
+Owned by **Tribe_X_dev_practices**. Read alongside the story spec's test plan before writing any test.
 
 ## What to Test
 

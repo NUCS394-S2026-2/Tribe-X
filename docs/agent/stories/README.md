@@ -1,6 +1,6 @@
 # Stories
 
-Story specs for TRIBE-X. Each spec drives implementation: acceptance criteria (Given/When/Then), TypeScript interfaces, technical approach, and test plan.
+Story specs for Tribe_X. Each spec drives implementation: acceptance criteria (Given/When/Then), TypeScript interfaces, technical approach, and test plan.
 
 **Agents:** read the story spec before writing any code. If no spec exists, stop and ask the human.
 

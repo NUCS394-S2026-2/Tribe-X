@@ -17,10 +17,10 @@ Welcome to the TRIBE_X tribe repository for Northwestern CS394 2026. We are buil
 
 The tribe is organized into two sub-tribes. Sub-tribes coordinate internally before surfacing work to the full tribe.
 
-| Team | Members           |
-| ---- | ----------------- |
-| Red  | TEAM_RED_MEMBERS  |
-| Blue | TEAM_BLUE_MEMBERS |
+| Team | Members                                   |
+| ---- | ----------------------------------------- |
+| Red  | Mercy, Wenpeng, Lian, Mitchell            |
+| Blue | Eric, Valary, Christopher, Corey, Stanley |
 
 ## Working Groups
 

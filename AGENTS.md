@@ -4,7 +4,7 @@
 
 ## Project Summary
 
-TRIBE_NAME is a Northwestern CS394 2026 multi-team client project building a web application for CLIENT_NAME. The tribe consists of approximately 15 students split across four color-coded teams (Red, Orange, Blue, Yellow). All teams contribute to a single shared codebase. This file is the canonical entry point for any coding agent working in this repository; read it before doing anything else, then follow the pointers into `docs/agent/` for detail.
+Tribe X is a Northwestern CS394 2026 multi-team client project building a web application for Robert Bismuth. The tribe consists of approximately 9 students split across two color-coded teams Red and Blue. All teams contribute to a single shared codebase. This file is the canonical entry point for any coding agent working in this repository; read it before doing anything else, then follow the pointers into `docs/agent/` for detail.
 
 ## Stack
 

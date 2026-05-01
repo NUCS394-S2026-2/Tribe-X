@@ -1,10 +1,10 @@
 # Architecture Guide
 
-Owned by **WORKING_GROUP_ARCH_DESIGN**. Read before touching more than one file or crossing a team boundary.
+Owned by **Tribe_X_arch_design**. Read before touching more than one file or crossing a team boundary.
 
 ## System Context
 
-TRIBE-X builds a React SPA for Robert. Firebase Auth handles identity; Cloud Firestore handles persistence. No backend services in scope for 2026 — all logic runs client-side except Firestore security rules.
+Tribe_X builds a React SPA for Robert. Firebase Auth handles identity; Cloud Firestore handles persistence. No backend services in scope for 2026 — all logic runs client-side except Firestore security rules.
 
 ## ADRs
 
@@ -27,7 +27,7 @@ Describe team ownership of the codebase here, or link to a separate doc if more 
 | Orange | `src/TEAM_ORANGE_SLICE/` | TEAM_ORANGE_OWNERSHIP_NOTES |
 | Blue | `src/TEAM_BLUE_SLICE/` | TEAM_BLUE_OWNERSHIP_NOTES |
 | Yellow | `src/TEAM_YELLOW_SLICE/` | TEAM_YELLOW_OWNERSHIP_NOTES |
-| Shared | `src/shared/` | WORKING_GROUP_ARCH_DESIGN reviews changes |
+| Shared | `src/shared/` | Tribe_X_arch_design reviews changes |
  -->
 
 Until the ownership map is filled in, treat all of `src/` as shared; any structural change needs guild approval.

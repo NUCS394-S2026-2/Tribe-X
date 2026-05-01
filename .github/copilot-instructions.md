@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions for TRIBE-X
+# GitHub Copilot Instructions for Tribe_X
 
 <!-- Placeholder — replace ALL_CAPS tokens with your tribe's values. Delete this comment when done. -->
 

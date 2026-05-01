@@ -1,4 +1,4 @@
-# CLAUDE.md — Claude Code Wrapper for TRIBE-X
+# CLAUDE.md — Claude Code Wrapper for Tribe_X
 
 <!-- Placeholder — replace ALL_CAPS tokens with your tribe's values. Delete this comment when done. -->
 

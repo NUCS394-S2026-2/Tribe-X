@@ -21,14 +21,11 @@ Link back to the [Project Structure](/docs//tribe/Project-Structure.md) doc. If 
 
 Describe team ownership of the codebase here, or link to a separate doc if more appropriate. Describe anything about the structure of the files in the codebase. Include any cross-team dependencies and how to navigate them.
 
-<!-- | Team | Owned path | Notes |
-|---|---|---|
-| Red | `src/TEAM_RED_SLICE/` | TEAM_RED_OWNERSHIP_NOTES |
-| Orange | `src/TEAM_ORANGE_SLICE/` | TEAM_ORANGE_OWNERSHIP_NOTES |
-| Blue | `src/TEAM_BLUE_SLICE/` | TEAM_BLUE_OWNERSHIP_NOTES |
-| Yellow | `src/TEAM_YELLOW_SLICE/` | TEAM_YELLOW_OWNERSHIP_NOTES |
-| Shared | `src/shared/` | WORKING_GROUP_ARCH_DESIGN reviews changes |
- -->
+| Team   | Owned path             | Notes                                     |
+| ------ | ---------------------- | ----------------------------------------- |
+| Red    | `src/TEAM_RED_SLICE/`  | TEAM_RED_OWNERSHIP_NOTES                  |
+| Blue   | `src/TEAM_BLUE_SLICE/` | TEAM_BLUE_OWNERSHIP_NOTES                 |
+| Shared | `src/shared/`          | WORKING_GROUP_ARCH_DESIGN reviews changes |
 
 Until the ownership map is filled in, treat all of `src/` as shared; any structural change needs guild approval.
 

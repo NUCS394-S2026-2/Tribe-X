@@ -1,10 +1,10 @@
 # Architecture Guide
 
-Owned by **WORKING_GROUP_ARCH_DESIGN**. Read before touching more than one file or crossing a team boundary.
+Owned by **Tribe_X_arch_design**. Read before touching more than one file or crossing a team boundary.
 
 ## System Context
 
-TRIBE_NAME builds a React SPA for CLIENT_NAME. Firebase Auth handles identity; Cloud Firestore handles persistence. No backend services in scope for 2026 — all logic runs client-side except Firestore security rules.
+Tribe_X builds a React SPA for Robert. Firebase Auth handles identity; Cloud Firestore handles persistence. No backend services in scope for 2026 — all logic runs client-side except Firestore security rules.
 
 ## ADRs
 

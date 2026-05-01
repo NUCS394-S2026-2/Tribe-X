@@ -6,8 +6,8 @@ All `ALL_CAPS` placeholders that should be replaced before agents can be fully u
 
 | Token                         | Description                      |
 | ----------------------------- | -------------------------------- |
-| `TRIBE_NAME`                  | Your tribe/team name             |
-| `CLIENT_NAME`                 | Client the app is built for      |
+| `TRIBE-X`                     | Your tribe/team name             |
+| `Robert`                      | Client the app is built for      |
 | `WORKING_GROUP_ARCH_DESIGN`   | Architecture & design guild name |
 | `WORKING_GROUP_DEV_PRACTICES` | Dev practices guild name         |
 
@@ -78,19 +78,19 @@ Design your testing strategy and fill in doc/testing.md.
 Find all occurrences of a token:
 
 ```bash
-grep -r "TRIBE_NAME" docs/
+grep -r "TRIBE-X" docs/
 ```
 
 Replace in all markdown files (macOS):
 
 ```bash
-find docs -name "*.md" -exec sed -i '' 's/TRIBE_NAME/YourTribeName/g' {} +
+find docs -name "*.md" -exec sed -i '' 's/TRIBE-X/YourTribeName/g' {} +
 ```
 
 Replace in all markdown files (Linux):
 
 ```bash
-find docs -name "*.md" | xargs sed -i 's/TRIBE_NAME/YourTribeName/g'
+find docs -name "*.md" | xargs sed -i 's/TRIBE-X/YourTribeName/g'
 ```
 
 List all remaining unreplaced tokens:
@@ -104,14 +104,14 @@ grep -roh '[A-Z_]\{5,\}' docs/agent/ | sort -u
 Find all occurrences of a token:
 
 ```powershell
-Get-ChildItem -Path docs -Recurse -Filter "*.md" | Select-String "TRIBE_NAME"
+Get-ChildItem -Path docs -Recurse -Filter "*.md" | Select-String "TRIBE-X"
 ```
 
 Replace a token in all markdown files:
 
 ```powershell
 Get-ChildItem -Path docs -Recurse -Filter "*.md" | ForEach-Object {
-  (Get-Content $_.FullName) -replace 'TRIBE_NAME', 'YourTribeName' | Set-Content $_.FullName
+  (Get-Content $_.FullName) -replace 'TRIBE-X', 'YourTribeName' | Set-Content $_.FullName
 }
 ```
 

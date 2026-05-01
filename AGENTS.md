@@ -17,7 +17,7 @@ Tribe X is a Northwestern CS394 2026 multi-team client project building a web ap
 | Linter / formatter | ESLint 9 (flat config) + Prettier                 |
 | Pre-commit         | Husky + lint-staged                               |
 | Backend            | Firebase / Firestore (configuration TBD by tribe) |
-| Styling            | TBD by tribe — do not assume Tailwind             |
+| Styling            | Tailwind CSS                                      |
 
 ## Repo Layout
 

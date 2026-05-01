@@ -6,39 +6,29 @@
 
 # Users
 
-- Users are software development teams who do mob programming with drivers and navigators.
+- Robert, a musician who is looking to get a tool to tag his music.
 
 # Value proposition
 
-An easy to use rotation timer for managing and tracking mob programming sessions.
+An easy to use tool that a user can upload a music file and it returns a set of tags.
 
 # Key features
 
 Simple mobile-friendly one-screen design with the app name at the top, and below it:
 
-- large countdown timer, defaulting to 10 minutes, but adjustable at the start of each session,
-- a single start/pause buttonm
-- the team members, shuffled at the start of each session, with the first name highlighted
-  Simple operations:
-- Tap a name to skip or include that team member in the rotation.
-- Tap start to start the timer, tap again to pause it.
-- When one minute is left, timer beeps and starts flashing.
-- When time is up, timer sounds an alarm, resets time, rotates to the next team member, and waits for start.
-  Recording-keeping:
-- At end of each turn, the app logs to the console the current time, rotation duration setting, the driver, and the navigators.
+- A box where a user can upload a MP3 file
+- a button "Generate Tags"
+- a pinwheel showing the loading state of the app
+- a list of tags of the music
+- a text box for the user to send feedback on the tags and re-generate the tags.
 
 # Example scenario
 
 Here is an example session.
 
-- Alice, Bob, Cathy, and Dave are a team of developers.
-- Alice, Cathy, and Dave meet to do mob programming for 90 minutes.
-- Alice starts the app on her phone.
-- It shows a countdown timer, set to 10 minutes, a start button, and a shuffled list of team member names with checkmarks.
-- The first name is highlighted. It happens to be Bob.
-- Alice taps Bob's nam because he is not there. The highlight moves to Dave.
-- Dave sits at the keyboard and starts the timer. He begins entering code suggested by the other team members.
-- Pizza arrives, so Dave stops the timer and grabs a slice. After a few minutes, he starts the timer to continue his turn.
-- A beep at 9 minutes warns the team is almost time to rotate.
-- Whem time goes to zero, an alarm sounds. Dave stops. The highlight moves to Cathy
-- Cathy taps the start button to begin her turn.
+- Alice has a MP3 file that she needs tagged.
+- Alice uploads this file to the app 
+- The app generates a set of tags of what it classifies the music as.
+- Alice reviews the tags and texts back some feedback
+- The tool accepts the feedback and sends back a new refined set of tags.
+- Alice copies or downloads the tags.

@@ -1,15 +1,15 @@
-# TRIBE_NAME — Project Home
+# TRIBE_X — Project Home
 
 <!-- Placeholder — replace ALL_CAPS tokens with your tribe's values. Delete this comment when done. -->
 
-Welcome to the TRIBE_NAME tribe repository for Northwestern CS394 2026. We are building a web application for CLIENT_NAME. This repo is shared by both teams; each team owns a slice of the codebase documented in `docs/agent/architecture.md`.
+Welcome to the TRIBE_X tribe repository for Northwestern CS394 2026. We are building a web application for Robert. This repo is shared by both teams; each team owns a slice of the codebase documented in `docs/agent/architecture.md`.
 
 ## Where to Find Things
 
-| Folder | Primary reader | What's in it |
-|---|---|---|
-| [`docs/tribe/Home.md`](tribe/Home.md) | Humans on the tribe | Meeting norms, practices, client info, guild membership |
-| [`docs/agent/`](agent/) | Coding agents (and curious humans) | Architecture, design, testing, data model, specs, ADRs |
+| Folder                                | Primary reader                     | What's in it                                            |
+| ------------------------------------- | ---------------------------------- | ------------------------------------------------------- |
+| [`docs/tribe/Home.md`](tribe/Home.md) | Humans on the tribe                | Meeting norms, practices, client info, guild membership |
+| [`docs/agent/`](agent/)               | Coding agents (and curious humans) | Architecture, design, testing, data model, specs, ADRs  |
 
 **Rule of thumb:** if its primary reader is a person navigating the project, it goes in `tribe/`. If its primary reader is a model doing a task, it goes in `agent/`. When in doubt, ask whoever owns development practices.
 
@@ -17,16 +17,14 @@ Welcome to the TRIBE_NAME tribe repository for Northwestern CS394 2026. We are b
 
 The tribe is organized into two sub-tribes. Sub-tribes coordinate internally before surfacing work to the full tribe.
 
- Team | Members |
-|---|---|
-| Red |  TEAM_RED_MEMBERS |
+| Team | Members           |
+| ---- | ----------------- |
+| Red  | TEAM_RED_MEMBERS  |
 | Blue | TEAM_BLUE_MEMBERS |
-| Orange | TEAM_ORANGE_MEMBERS |
-|Yellow | TEAM_YELLOW_MEMBERS |
 
 ## Working Groups
 
-Cross-team groups that own shared concerns. The tribe decides how many groups it needs and what they are called. 
+Cross-team groups that own shared concerns. The tribe decides how many groups it needs and what they are called.
 
 Four concern areas must be owned by someone: **Organizational Practices**, **Development Practices**, **Client Interaction**, **Architecture and Design**. The tribe may combine or split these as it sees fit.
 

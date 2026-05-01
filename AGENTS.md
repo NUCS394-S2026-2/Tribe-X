@@ -1,4 +1,4 @@
-# AGENTS.md — Agent Brief for TRIBE_NAME
+# AGENTS.md — Agent Brief for TRIBE-X
 
 <!-- Placeholder — replace ALL_CAPS tokens with your tribe's values. Delete this comment when done. -->
 

@@ -1,44 +1,52 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, test } from 'vitest';
 
 import App from './App';
 
 describe('App component', () => {
-  test('renders the heading and links', () => {
+  test('renders the frame with team sections', () => {
     render(<App />);
-    expect(screen.getByText(/Vite \+ React \+ Typescript/)).toBeInTheDocument();
-    expect(screen.getByText('Learn React')).toBeInTheDocument();
-    expect(screen.getByText('Vite Docs')).toBeInTheDocument();
-    expect(screen.getByText('Vitest Docs')).toBeInTheDocument();
+    expect(screen.getByText(/Tribe X/)).toBeInTheDocument();
+    expect(screen.getByText('Red Team')).toBeInTheDocument();
+    expect(screen.getByText('Blue Team')).toBeInTheDocument();
   });
 
-  test('counter should be 0 at the start', () => {
+  test('renders mock users in their respective teams', () => {
     render(<App />);
-    expect(screen.getByText('count is: 0')).toBeInTheDocument();
+    expect(screen.getByText('Cai, Wenpeng')).toBeInTheDocument();
+    expect(screen.getByText('Ridad, Christopher')).toBeInTheDocument();
   });
 
-  test('counter should increment by one when clicked', async () => {
-    const user = userEvent.setup();
+  test('given the app is rendered when a user email link is displayed then it is clickable', () => {
     render(<App />);
-    const counter = screen.getByRole('button');
-    await user.click(counter);
-    expect(screen.getByText('count is: 1')).toBeInTheDocument();
+    const redEmail = screen.getByRole('link', { name: 'c9v3w5@u.northwestern.edu' });
+    const blueEmail = screen.getByRole('link', {
+      name: 'christopherridad2027@u.northwestern.edu',
+    });
+    expect(redEmail).toHaveAttribute('href', 'mailto:c9v3w5@u.northwestern.edu');
+    expect(blueEmail).toHaveAttribute(
+      'href',
+      'mailto:christopherridad2027@u.northwestern.edu',
+    );
   });
 
-  test('counter should increment multiple times', async () => {
-    const user = userEvent.setup();
+  test('renders user images with alt text', () => {
     render(<App />);
-    const counter = screen.getByRole('button');
-    await user.click(counter);
-    await user.click(counter);
-    await user.click(counter);
-    expect(screen.getByText('count is: 3')).toBeInTheDocument();
+    expect(screen.getByAltText('Cai, Wenpeng')).toBeInTheDocument();
+    expect(screen.getByAltText('Ridad, Christopher')).toBeInTheDocument();
   });
 
-  test('renders the logo image', () => {
+  test('renders user images from URLs', () => {
     render(<App />);
-    const logo = screen.getByAltText('logo');
-    expect(logo).toBeInTheDocument();
+    const redImg = screen.getByAltText('Cai, Wenpeng');
+    const blueImg = screen.getByAltText('Ridad, Christopher');
+    expect(redImg).toHaveAttribute(
+      'src',
+      'https://ui-avatars.com/api/?name=Wenpeng+Cai&background=D32F2F&color=FFFFFF',
+    );
+    expect(blueImg).toHaveAttribute(
+      'src',
+      'https://ui-avatars.com/api/?name=Christopher+Ridad&background=1565C0&color=FFFFFF',
+    );
   });
 });

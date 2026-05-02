@@ -27,7 +27,7 @@ Simple mobile-friendly one-screen design with the app name at the top, and below
 Here is an example session.
 
 - Alice has a MP3 file that she needs tagged.
-- Alice uploads this file to the app 
+- Alice uploads this file to the app
 - The app generates a set of tags of what it classifies the music as.
 - Alice reviews the tags and texts back some feedback
 - The tool accepts the feedback and sends back a new refined set of tags.

@@ -2,17 +2,34 @@
 
 Owned by **Tribe_X_arch_design**. Read before creating or modifying any component.
 
-## Styling — decide in Iteration 0
+## Styling — Tailwind CSS
 
-No styling approach is committed. **Do not assume Tailwind or any CSS framework.** Tribe_X_arch_design records the decision as ADR 0002. Options to evaluate (must work with Vite 8 + React 19): CSS modules, Tailwind, CSS-in-JS.
+**Approach:** Utility-first with Tailwind CSS v4. See ADR 0002 for rationale.
 
-**Current status:** STYLING_APPROACH_STATUS
+**Color tokens** (defined in `tailwind.config.ts`):
+
+- `bg-team-red` / `text-team-red` → #D32F2F
+- `bg-team-blue` / `text-team-blue` → #1565C0
+
+All components use these utilities; no custom CSS files for styling.
 
 ## Component Conventions
 
-- When to create new vs extend existing: COMPONENT_CREATION_GUIDELINES
-- File organization (co-location, naming): COMPONENT_FILE_ORGANIZATION
-- Token names (colors, spacing) once styling is decided: COLOR_AND_SPACING_TOKENS
+**Shared components** live in `src/components/` and are co-located with their tests:
+
+- `UserCard/` — shared across all teams; displays member picture, name, email
+- `Frame/` — root container; owned by Tribe_X_arch_design
+
+**Team components** live in `src/components/{color}-team/`:
+
+- `red-team/RedTeam.tsx` — render red team members using UserCard
+- `blue-team/BlueTeam.tsx` — render blue team members using UserCard
+
+Each component file is paired with a `.test.tsx` file.
+
+**Shared component changes** (UserCard, Frame) require PR approval from Tribe_X_arch_design. See ADR 0003.
+
+**Team component autonomy**: Teams can style and layout members however they wish; only UserCard contract is fixed.
 
 ## Accessibility Minimums
 

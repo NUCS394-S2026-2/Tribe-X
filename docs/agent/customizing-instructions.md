@@ -14,6 +14,7 @@ All `ALL_CAPS` placeholders that should be replaced before agents can be fully u
 ## Architecture Tokens
 
 Recommend describing the architecture and ownership in `docs/agent/architecture.md`
+
 - Frontend Ownership: Client Application (Web/Mobile) built in React, utilizing a Firebase Hook for communication.
 - Backend Ownership: Managed via Firebase Functions which acts as the orchestration layer.
 - Logic Ownership: An Agent Interface handles the "Internal Logic," coordinating between multiple external services:

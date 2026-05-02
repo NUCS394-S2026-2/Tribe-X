@@ -19,18 +19,19 @@ Link back to the [Project Structure](/docs//tribe/Project-Structure.md) doc. If 
 
 ## Team Ownership
 
-Describe team ownership of the codebase here, or link to a separate doc if more appropriate. Describe anything about the structure of the files in the codebase. Include any cross-team dependencies and how to navigate them.
+| Team                | Owned path                  | Notes                                               |
+| ------------------- | --------------------------- | --------------------------------------------------- |
+| Red Team            | `src/components/red-team/`  | Render red team members; use shared UserCard        |
+| Blue Team           | `src/components/blue-team/` | Render blue team members; use shared UserCard       |
+| Tribe_X_arch_design | `src/components/Frame/`     | Root container; owns team composition logic         |
+| Tribe_X_arch_design | `src/components/UserCard/`  | Shared member display; used by all teams            |
+| Tribe_X_arch_design | `src/shared/`               | Shared types and utilities; reviewed on all changes |
 
-<!-- | Team | Owned path | Notes |
-|---|---|---|
-| Red | `src/TEAM_RED_SLICE/` | TEAM_RED_OWNERSHIP_NOTES |
-| Orange | `src/TEAM_ORANGE_SLICE/` | TEAM_ORANGE_OWNERSHIP_NOTES |
-| Blue | `src/TEAM_BLUE_SLICE/` | TEAM_BLUE_OWNERSHIP_NOTES |
-| Yellow | `src/TEAM_YELLOW_SLICE/` | TEAM_YELLOW_OWNERSHIP_NOTES |
-| Shared | `src/shared/` | Tribe_X_arch_design reviews changes |
- -->
+**Cross-team dependencies:**
 
-Until the ownership map is filled in, treat all of `src/` as shared; any structural change needs guild approval.
+- Red Team and Blue Team both depend on UserCard and User type (owned by Tribe_X_arch_design)
+- Frame depends on Red Team and Blue Team components
+- See ADR 0003 for shared component rules
 
 ## Cross-Team Dependencies
 

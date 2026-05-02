@@ -38,6 +38,6 @@ This is the registry of every harness control in our tribe. Every time we add a 
 
 _When the tribe adds a control in response to an incident, record it here: what went wrong, what was added, what sprint._
 
-| Sprint      | Incident          | Control added    |
-| ----------- | ----------------- | ---------------- |
-| _SPRINT_ID_ | _What went wrong_ | _What was added_ |
+| Sprint      | Incident                                            | Control added                                                                       |
+| ----------- | --------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Iteration 0 | Need shared styling approach and component strategy | ADR 0002 (CSS), ADR 0003 (shared components), team ownership map in architecture.md |

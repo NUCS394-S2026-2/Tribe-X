@@ -47,4 +47,4 @@ Before generating non-trivial code, check whether a story spec exists in `docs/a
 
 - React 19, TypeScript strict, Vite 8, Vitest 4, ESLint 9 flat config
 - Backend: Firebase/Firestore — see `docs/agent/data-model.md` for collection shapes
-- Styling: TBD by tribe — do not assume or introduce Tailwind or any CSS framework
+- Styling: Tailwind CSS

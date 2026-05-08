@@ -9,10 +9,8 @@ Run:
 import os
 import tempfile
 
-import secrets
-
 import uvicorn
-from fastapi import FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from metamusic_tagger import MetaMusicTagger
@@ -27,24 +25,20 @@ app.add_middleware(
         "https://tribe-x.firebaseapp.com",
     ],
     allow_methods=["POST"],
-    allow_headers=["x-api-key"],
+    allow_headers=["*"],
 )
 
 _tagger = MetaMusicTagger()
-_api_key = os.environ.get("API_KEY", "")
 
 SUPPORTED = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aiff", ".aif"}
 
 
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...), x_api_key: str = Header(...)):
-    if not _api_key or not secrets.compare_digest(x_api_key, _api_key):
-        raise HTTPException(status_code=401, detail="Unauthorized")
+async def analyze(file: UploadFile = File(...)):
     ext = os.path.splitext(file.filename or "")[1].lower()
     if ext not in SUPPORTED:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
 
-    # Write to a temp file — librosa/essentia need a path, not a stream
     with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
         tmp.write(await file.read())
         tmp_path = tmp.name
@@ -66,7 +60,7 @@ async def analyze(file: UploadFile = File(...), x_api_key: str = Header(...)):
         "instruments": instruments,
         "vocalTraits": vocal_traits,
         "soundsLike": sounds_like,
-        "confidenceScore": result["key_strength"],  # 0–1 tonal clarity
+        "confidenceScore": result["key_strength"],
     }
 
 

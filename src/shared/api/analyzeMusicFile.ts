@@ -1,6 +1,7 @@
 import { MusicTags } from '../types/MusicTags';
 
 const ANALYSIS_API = import.meta.env.VITE_ANALYSIS_API_URL ?? 'http://localhost:8000';
+const API_KEY = import.meta.env.VITE_API_KEY ?? '';
 
 export async function analyzeMusicFile(file: File): Promise<MusicTags> {
   const form = new FormData();
@@ -8,8 +9,8 @@ export async function analyzeMusicFile(file: File): Promise<MusicTags> {
 
   const res = await fetch(`${ANALYSIS_API}/analyze`, {
     method: 'POST',
+    headers: { 'x-api-key': API_KEY },
     body: form,
-    // No Content-Type header — browser sets it with the correct multipart boundary
   });
 
   if (!res.ok) {

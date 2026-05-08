@@ -10,3 +10,14 @@ firebase.js
 .agents
 .firebase
 .claude/skills
+
+# Claude Code
+CLAUDE.md
+skills-lock.json
+.claude/memory/
+.claude/plans/
+
+# Environment secrets
+.env
+.env.*
+!.env.example

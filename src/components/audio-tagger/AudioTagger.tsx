@@ -3,15 +3,69 @@ import React, { useRef, useState } from 'react';
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
 import { MusicTags } from '../../shared/types/MusicTags';
 
-function formatTags(tags: MusicTags): string {
-  const list = (arr: string[]) => (arr.length ? arr.join(', ') : '(none)');
-  return [
-    `Genres:       ${list(tags.genres)}`,
-    `Instruments:  ${list(tags.instruments)}`,
-    `Vocal Traits: ${list(tags.vocalTraits)}`,
-    `Sounds Like:  ${list(tags.soundsLike ?? [])}`,
-    `Confidence:   ${Math.round(tags.confidenceScore * 100)}%`,
-  ].join('\n');
+function TagPills({ items }: { items: string[] }) {
+  if (!items.length) {
+    return <span className="text-sm text-gray-400 italic">(none)</span>;
+  }
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <span
+          key={item}
+          className="inline-flex items-center rounded-full bg-team-blue/10 px-3 py-1 text-xs font-medium text-team-blue ring-1 ring-inset ring-team-blue/20"
+        >
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TagRow({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+      </span>
+      <TagPills items={items} />
+    </div>
+  );
+}
+
+function ConfidenceBar({ score }: { score: number }) {
+  const pct = Math.round(score * 100);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Confidence
+        </span>
+        <span className="text-xs font-semibold text-green-600">{pct}%</span>
+      </div>
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+        <div
+          className="h-full rounded-full bg-green-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MusicTagsDisplay({ tags }: { tags: MusicTags }) {
+  return (
+    <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+      <TagRow label="Genres" items={tags.genres} />
+      <TagRow label="Instruments" items={tags.instruments} />
+      <TagRow label="Vocal Traits" items={tags.vocalTraits} />
+      <TagRow label="Sounds Like" items={tags.soundsLike ?? []} />
+      <ConfidenceBar score={tags.confidenceScore} />
+    </div>
+  );
 }
 
 export function AudioTagger(): React.ReactElement {
@@ -87,20 +141,16 @@ export function AudioTagger(): React.ReactElement {
         )}
 
         <div className="mt-6">
-          <label
-            htmlFor="music-tags"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            Music Tags
-          </label>
-          <textarea
-            id="music-tags"
-            readOnly
-            rows={7}
-            value={tags ? formatTags(tags) : ''}
-            placeholder="Tags will appear here after analysis…"
-            className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-team-blue focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-team-blue"
-          />
+          <p className="block text-sm font-semibold text-gray-700">Music Tags</p>
+          {tags ? (
+            <div className="mt-2">
+              <MusicTagsDisplay tags={tags} />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-gray-400 italic">
+              Tags will appear here after analysis…
+            </p>
+          )}
         </div>
       </div>
     </section>

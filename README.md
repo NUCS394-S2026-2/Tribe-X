@@ -55,6 +55,33 @@ The app template targets the 2026 major-version baseline verified in this reposi
 
 More: [Vite](https://vitejs.dev) · [React](https://reactjs.org/) · [TypeScript](https://www.typescriptlang.org/) · [ESLint](https://eslint.org/) · [Prettier](https://prettier.io/) · [Vitest](https://vitest.dev/) · [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 
+## Running the App Locally
+
+You need two terminals running at the same time — one for the frontend, one for the backend.
+
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+### Backend (Python analysis server)
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn api:app --reload --port 8000
+```
+
+The backend runs at `http://localhost:8000`. The frontend is pre-configured to talk to it via the `VITE_ANALYSIS_API_URL` environment variable (defaults to `http://localhost:8000` if not set).
+
+> **Note:** The backend requires Python 3.9+ and `essentia`, which only has pre-built wheels for macOS and Linux. Windows users should use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
+
+---
+
 ## Scripts
 
 - `npm run dev` — start the Vite dev server

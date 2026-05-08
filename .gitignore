@@ -21,3 +21,10 @@ skills-lock.json
 .env
 .env.*
 !.env.example
+
+# Python backend
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.xlsx
+backend/outputs/

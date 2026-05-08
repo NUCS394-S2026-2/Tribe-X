@@ -1,16 +1,31 @@
 import { MusicTags } from '../types/MusicTags';
 
-// TODO: Replace with real backend call once the analysis function is implemented
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function analyzeMusicFile(_: File): Promise<MusicTags> {
-  await new Promise((r) => setTimeout(r, 1500));
+const ANALYSIS_API = import.meta.env.VITE_ANALYSIS_API_URL ?? 'http://localhost:8000';
+
+export async function analyzeMusicFile(file: File): Promise<MusicTags> {
+  const form = new FormData();
+  form.append('file', file);
+
+  const res = await fetch(`${ANALYSIS_API}/analyze`, {
+    method: 'POST',
+    body: form,
+    // No Content-Type header — browser sets it with the correct multipart boundary
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText);
+    throw new Error(`Analysis failed (${res.status}): ${detail}`);
+  }
+
+  const data = await res.json();
+
   return {
-    trackId: 'stub-track-id',
-    genres: ['Cinematic', 'Electronic'],
-    instruments: ['Synthesizer', 'Drums'],
-    vocalTraits: [],
-    soundsLike: ['Hans Zimmer', 'Explosions in the Sky'],
-    confidenceScore: 0.87,
+    trackId: crypto.randomUUID(),
+    genres: data.genres,
+    instruments: data.instruments,
+    vocalTraits: data.vocalTraits,
+    soundsLike: data.soundsLike,
+    confidenceScore: data.confidenceScore,
     lastUpdated: new Date(),
   };
 }

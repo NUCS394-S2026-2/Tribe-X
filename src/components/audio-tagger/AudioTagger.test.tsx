@@ -25,7 +25,7 @@ describe('AudioTagger', () => {
     render(<AudioTagger />);
     expect(screen.getByLabelText(/select audio file/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /analyze/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/music tags/i)).toBeInTheDocument();
+    expect(screen.getByText(/music tags/i)).toBeInTheDocument();
   });
 
   it('disables the analyze button when no file is selected', () => {
@@ -41,7 +41,7 @@ describe('AudioTagger', () => {
     expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
   });
 
-  it('shows "Analyzing…" while loading and then populates the music tags textarea', async () => {
+  it('shows "Analyzing…" while loading and then populates the music tags display', async () => {
     let resolveAnalyze!: (tags: MusicTags) => void;
     const deferred = new Promise<MusicTags>((resolve) => {
       resolveAnalyze = resolve;
@@ -62,12 +62,10 @@ describe('AudioTagger', () => {
     resolveAnalyze(mockTags);
 
     await waitFor(() => {
-      const textarea = screen.getByLabelText(/music tags/i) as HTMLTextAreaElement;
-      expect(textarea.value).toContain('Cinematic');
+      expect(screen.getByText('Cinematic')).toBeInTheDocument();
     });
-    const textarea = screen.getByLabelText(/music tags/i) as HTMLTextAreaElement;
-    expect(textarea.value).toContain('Synthesizer');
-    expect(textarea.value).toContain('87%');
+    expect(screen.getByText('Synthesizer')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '87');
   });
 
   it('shows an error message when analysis fails', async () => {

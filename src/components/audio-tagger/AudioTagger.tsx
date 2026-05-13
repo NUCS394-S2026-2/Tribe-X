@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
-import type { MusicTags as MusicTagsData } from '../../shared/types/MusicTags';
-import { MusicTags } from './MusicTags';
+import type { MusicTags } from '../../shared/types/MusicTags';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const SUPPORTED_TYPES = new Set([
@@ -23,7 +22,6 @@ interface FileValidationError {
 }
 
 function validateAudioFile(file: File): FileValidationError | null {
-  // Check file size
   if (file.size > MAX_FILE_SIZE) {
     return {
       type: 'too-large',
@@ -31,9 +29,7 @@ function validateAudioFile(file: File): FileValidationError | null {
     };
   }
 
-  // Check MIME type
   if (!SUPPORTED_TYPES.has(file.type)) {
-    // Also check file extension as fallback
     const extension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
     if (!SUPPORTED_EXTENSIONS.has(extension)) {
       return {
@@ -47,20 +43,74 @@ function validateAudioFile(file: File): FileValidationError | null {
   return null;
 }
 
-function formatTags(tags: MusicTagsData): string {
-  const list = (arr: string[]) => (arr.length ? arr.join(', ') : '(none)');
-  return [
-    `Genres:       ${list(tags.genres)}`,
-    `Instruments:  ${list(tags.instruments)}`,
-    `Vocal Traits: ${list(tags.vocalTraits)}`,
-    `Sounds Like:  ${list(tags.soundsLike ?? [])}`,
-    `Confidence:   ${Math.round(tags.confidenceScore * 100)}%`,
-  ].join('\n');
+function TagPills({ items }: { items: string[] }) {
+  if (!items.length) {
+    return <span className="text-sm text-gray-400 italic">(none)</span>;
+  }
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <span
+          key={item}
+          className="inline-flex items-center rounded-full bg-team-blue/10 px-3 py-1 text-xs font-medium text-team-blue ring-1 ring-inset ring-team-blue/20"
+        >
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TagRow({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+      </span>
+      <TagPills items={items} />
+    </div>
+  );
+}
+
+function ConfidenceBar({ score }: { score: number }) {
+  const pct = Math.round(score * 100);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Confidence
+        </span>
+        <span className="text-xs font-semibold text-green-600">{pct}%</span>
+      </div>
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+        <div
+          className="h-full rounded-full bg-green-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MusicTagsDisplay({ tags }: { tags: MusicTags }) {
+  return (
+    <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+      <TagRow label="Genres" items={tags.genres} />
+      <TagRow label="Instruments" items={tags.instruments} />
+      <TagRow label="Vocal Traits" items={tags.vocalTraits} />
+      <TagRow label="Sounds Like" items={tags.soundsLike ?? []} />
+      <ConfidenceBar score={tags.confidenceScore} />
+    </div>
+  );
 }
 
 export function AudioTagger(): React.ReactElement {
   const [file, setFile] = useState<File | null>(null);
-  const [tagText, setTagText] = useState('');
+  const [tags, setTags] = useState<MusicTags | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<FileValidationError | null>(
@@ -71,7 +121,7 @@ export function AudioTagger(): React.ReactElement {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] ?? null;
     setFile(selected);
-    setTagText('');
+    setTags(null);
     setError(null);
     setValidationError(null);
 
@@ -79,7 +129,7 @@ export function AudioTagger(): React.ReactElement {
       const validationResult = validateAudioFile(selected);
       if (validationResult) {
         setValidationError(validationResult);
-        setFile(null); // Clear invalid file
+        setFile(null);
       }
     }
   };
@@ -90,7 +140,7 @@ export function AudioTagger(): React.ReactElement {
     setError(null);
     try {
       const result = await analyzeMusicFile(file);
-      setTagText(formatTags(result));
+      setTags(result);
     } catch {
       setError('Analysis failed. Please try again.');
     } finally {
@@ -150,11 +200,18 @@ export function AudioTagger(): React.ReactElement {
           </p>
         )}
 
-        <MusicTags
-          value={tagText}
-          onChange={setTagText}
-          placeholder="Tags will appear here after analysis…"
-        />
+        <div className="mt-6">
+          <p className="block text-sm font-semibold text-gray-700">Music Tags</p>
+          {tags ? (
+            <div className="mt-2">
+              <MusicTagsDisplay tags={tags} />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-gray-400 italic">
+              Tags will appear here after analysis…
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
-import { MusicTags } from '../../shared/types/MusicTags';
+import type { MusicTags as MusicTagsData } from '../../shared/types/MusicTags';
+import { MusicTags } from './MusicTags';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const SUPPORTED_TYPES = new Set([
@@ -46,7 +47,7 @@ function validateAudioFile(file: File): FileValidationError | null {
   return null;
 }
 
-function formatTags(tags: MusicTags): string {
+function formatTags(tags: MusicTagsData): string {
   const list = (arr: string[]) => (arr.length ? arr.join(', ') : '(none)');
   return [
     `Genres:       ${list(tags.genres)}`,
@@ -59,7 +60,7 @@ function formatTags(tags: MusicTags): string {
 
 export function AudioTagger(): React.ReactElement {
   const [file, setFile] = useState<File | null>(null);
-  const [tags, setTags] = useState<MusicTags | null>(null);
+  const [tagText, setTagText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<FileValidationError | null>(
@@ -70,7 +71,7 @@ export function AudioTagger(): React.ReactElement {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] ?? null;
     setFile(selected);
-    setTags(null);
+    setTagText('');
     setError(null);
     setValidationError(null);
 
@@ -89,7 +90,7 @@ export function AudioTagger(): React.ReactElement {
     setError(null);
     try {
       const result = await analyzeMusicFile(file);
-      setTags(result);
+      setTagText(formatTags(result));
     } catch {
       setError('Analysis failed. Please try again.');
     } finally {
@@ -149,22 +150,11 @@ export function AudioTagger(): React.ReactElement {
           </p>
         )}
 
-        <div className="mt-6">
-          <label
-            htmlFor="music-tags"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            Music Tags
-          </label>
-          <textarea
-            id="music-tags"
-            readOnly
-            rows={7}
-            value={tags ? formatTags(tags) : ''}
-            placeholder="Tags will appear here after analysis…"
-            className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-mono text-sm text-gray-800 placeholder:text-gray-400 focus:border-team-blue focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-team-blue"
-          />
-        </div>
+        <MusicTags
+          value={tagText}
+          onChange={setTagText}
+          placeholder="Tags will appear here after analysis…"
+        />
       </div>
     </section>
   );

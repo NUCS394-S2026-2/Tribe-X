@@ -40,14 +40,15 @@ except ImportError:
 # Essentia feature extraction
 # ---------------------------------------------------------------------------
 
+ANALYSIS_DURATION = 30  # seconds — analyse first 30s for speed
+
+
 def extract_essentia_features(audio_path: str) -> dict:
-    """
-    Extract audio features using Essentia algorithms.
-    Returns a dictionary of measurements.
-    """
-    # Load audio — Essentia uses float32, mono
-    loader = es.MonoLoader(filename=audio_path, sampleRate=44100)
-    audio = loader()
+    # Load audio — Essentia uses float32, mono, capped at ANALYSIS_DURATION
+    loader = es.MonoLoader(filename=audio_path, sampleRate=22050)
+    audio_full = loader()
+    max_samples = ANALYSIS_DURATION * 22050
+    audio = audio_full[:max_samples] if len(audio_full) > max_samples else audio_full
 
     # --- Rhythm ---
     rhythm = es.RhythmExtractor2013(method="multifeature")
@@ -61,7 +62,7 @@ def extract_essentia_features(audio_path: str) -> dict:
     rms        = float(np.sqrt(np.mean(audio ** 2)))
     loudness   = float(es.Loudness()(audio))
 
-    # --- Danceability (0 = not danceable, 3 = very danceable) ---
+    # --- Danceability ---
     danceability, _ = es.Danceability()(audio)
 
     # --- Spectral centroid (brightness) ---
@@ -70,22 +71,14 @@ def extract_essentia_features(audio_path: str) -> dict:
     # --- Zero crossing rate ---
     zcr = float(es.ZeroCrossingRate()(audio))
 
-    # --- MFCCs (frame-by-frame, then average) ---
-    window    = es.Windowing(type='hann')
-    spectrum  = es.Spectrum()
-    mfcc_algo = es.MFCC(numberCoefficients=13)
-
-    mfcc_frames = []
-    for frame in es.FrameGenerator(audio, frameSize=2048, hopSize=512, startFromZero=True):
-        spec = spectrum(window(frame))
-        _, mfcc_frame = mfcc_algo(spec)
-        mfcc_frames.append(mfcc_frame)
-
-    mfcc_mean = np.mean(mfcc_frames, axis=0) if mfcc_frames else np.zeros(13)
+    # --- MFCCs via librosa (vectorised, much faster than frame loop) ---
+    mfcc_mean = np.mean(
+        librosa.feature.mfcc(y=audio.astype(np.float32), sr=22050, n_mfcc=13),
+        axis=1,
+    )
 
     # --- Harmonic / percussive ratio via librosa HPSS ---
-    # Resample to 22050 for librosa
-    audio_lr = librosa.resample(audio.astype(np.float32), orig_sr=44100, target_sr=22050)
+    audio_lr = audio.astype(np.float32)
     y_harm, y_perc = librosa.effects.hpss(audio_lr)
     harm_rms = float(np.mean(librosa.feature.rms(y=y_harm)))
     perc_rms = float(np.mean(librosa.feature.rms(y=y_perc)))
@@ -93,7 +86,7 @@ def extract_essentia_features(audio_path: str) -> dict:
 
     # --- Onset density ---
     onset_frames  = librosa.onset.onset_detect(y=audio_lr, sr=22050)
-    duration      = len(audio) / 44100
+    duration      = len(audio) / 22050
     onset_density = len(onset_frames) / duration if duration > 0 else 0.0
 
     # --- Chroma (pitch class distribution) via librosa ---

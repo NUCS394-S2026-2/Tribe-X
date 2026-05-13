@@ -9,7 +9,6 @@ export async function analyzeMusicFile(file: File): Promise<MusicTags> {
   const res = await fetch(`${ANALYSIS_API}/analyze`, {
     method: 'POST',
     body: form,
-    // No Content-Type header — browser sets it with the correct multipart boundary
   });
 
   if (!res.ok) {

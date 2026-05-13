@@ -85,4 +85,68 @@ describe('AudioTagger', () => {
       expect(screen.getByRole('alert')).toHaveTextContent(/analysis failed/i);
     });
   });
+
+  it('accepts valid audio files and enables analyze button', async () => {
+    render(<AudioTagger />);
+    const input = screen.getByLabelText(/select audio file/i);
+
+    // Test MP3
+    const mp3File = new File(['audio'], 'track.mp3', { type: 'audio/mpeg' });
+    await userEvent.upload(input, mp3File);
+    expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    // Test WAV
+    const wavFile = new File(['audio'], 'track.wav', { type: 'audio/wav' });
+    await userEvent.upload(input, wavFile);
+    expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('rejects invalid file types and shows error message', async () => {
+    render(<AudioTagger />);
+    const input = screen.getByLabelText(/select audio file/i);
+
+    const invalidFile = new File(['text'], 'document.exe', { type: 'text/plain' });
+    await userEvent.upload(input, invalidFile);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/unsupported file type/i);
+    });
+    expect(screen.getByRole('button', { name: /analyze/i })).toBeDisabled();
+  });
+
+  it('rejects files that are too large and shows error message', async () => {
+    render(<AudioTagger />);
+    const input = screen.getByLabelText(/select audio file/i);
+
+    // Create a file larger than 50MB
+    const largeFile = new File(['x'.repeat(51 * 1024 * 1024)], 'large.mp3', {
+      type: 'audio/mpeg',
+    });
+    await userEvent.upload(input, largeFile);
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/file too large/i);
+    expect(screen.getByRole('button', { name: /analyze/i })).toBeDisabled();
+  });
+
+  it('clears validation errors when a valid file is selected after an invalid one', async () => {
+    render(<AudioTagger />);
+    const input = screen.getByLabelText(/select audio file/i);
+
+    // First upload invalid file
+    const invalidFile = new File(['text'], 'document.exe', { type: 'text/plain' });
+    await userEvent.upload(input, invalidFile);
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/unsupported file type/i);
+    });
+
+    // Then upload valid file
+    const validFile = new File(['audio'], 'track.mp3', { type: 'audio/mpeg' });
+    await userEvent.upload(input, validFile);
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
+  });
 });

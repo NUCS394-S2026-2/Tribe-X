@@ -19,7 +19,11 @@ app = FastAPI(title="MetaMusic Analysis API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_origins=[
+        "http://localhost:5173",
+        "https://tribe-x.web.app",
+        "https://tribe-x.firebaseapp.com",
+    ],
     allow_methods=["POST"],
     allow_headers=["*"],
 )
@@ -35,7 +39,6 @@ async def analyze(file: UploadFile = File(...)):
     if ext not in SUPPORTED:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
 
-    # Write to a temp file — librosa/essentia need a path, not a stream
     with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
         tmp.write(await file.read())
         tmp_path = tmp.name
@@ -57,7 +60,7 @@ async def analyze(file: UploadFile = File(...)):
         "instruments": instruments,
         "vocalTraits": vocal_traits,
         "soundsLike": sounds_like,
-        "confidenceScore": result["key_strength"],  # 0–1 tonal clarity
+        "confidenceScore": result["key_strength"],
     }
 
 

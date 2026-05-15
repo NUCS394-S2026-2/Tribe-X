@@ -96,9 +96,74 @@ function ConfidenceBar({ score }: { score: number }) {
   );
 }
 
+function formatTagsForClipboard(tags: MusicTags): string {
+  const pct = Math.round(tags.confidenceScore * 100);
+  const lines: string[] = [
+    `Genres: ${tags.genres.join(', ') || '(none)'}`,
+    `Instruments: ${tags.instruments.join(', ') || '(none)'}`,
+    `Vocal Traits: ${tags.vocalTraits.join(', ') || '(none)'}`,
+    `Sounds Like: ${(tags.soundsLike ?? []).join(', ') || '(none)'}`,
+    `Confidence: ${pct}%`,
+  ];
+  return lines.join('\n');
+}
+
+function CopyButton({ tags }: { tags: MusicTags }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(formatTagsForClipboard(tags));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm transition-colors duration-150 hover:border-team-blue hover:text-team-blue focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-team-blue"
+      aria-label="Copy tags to clipboard"
+    >
+      {copied ? (
+        <>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="h-3.5 w-3.5 text-green-500"
+          >
+            <path
+              fillRule="evenodd"
+              d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span className="text-green-600">Copied!</span>
+        </>
+      ) : (
+        <>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="h-3.5 w-3.5"
+          >
+            <path d="M3.5 2A1.5 1.5 0 0 0 2 3.5v9A1.5 1.5 0 0 0 3.5 14h5.793a1.5 1.5 0 0 0 1.06-.44l2.707-2.706A1.5 1.5 0 0 0 13.5 9.75V6.5A1.5 1.5 0 0 0 12 5h-1V3.5A1.5 1.5 0 0 0 9.5 2h-6ZM9.5 6.5H12l-2.5 2.5V6.5Z" />
+          </svg>
+        </>
+      )}
+    </button>
+  );
+}
+
 function MusicTagsDisplay({ tags }: { tags: MusicTags }) {
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Results
+        </span>
+        <CopyButton tags={tags} />
+      </div>
       <TagRow label="Genres" items={tags.genres} />
       <TagRow label="Instruments" items={tags.instruments} />
       <TagRow label="Vocal Traits" items={tags.vocalTraits} />

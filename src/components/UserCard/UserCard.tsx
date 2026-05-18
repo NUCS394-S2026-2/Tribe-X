@@ -11,7 +11,6 @@ export function UserCard({ user }: UserCardProps): React.ReactElement {
     <div className="group flex flex-col items-center rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
       <div className="relative overflow-hidden rounded-full">
         <img
-          src={user.photoUrl}
           alt={user.displayName}
           className="h-28 w-28 object-cover transition-transform duration-300 group-hover:scale-110"
         />

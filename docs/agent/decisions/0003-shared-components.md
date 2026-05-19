@@ -41,7 +41,6 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
   return (
     <div className="flex flex-col items-center rounded-lg p-4 bg-white shadow-md">
       <img
-        src={user.photoUrl}
         alt={user.displayName}
         className="h-24 w-24 rounded-full object-cover"
       />

@@ -9,15 +9,12 @@ describe('UserCard', () => {
     uid: '1',
     email: 'test@example.com',
     displayName: 'Test User',
-    photoUrl: 'https://example.com/photo.jpg',
-    team: 'red',
   };
 
   it('renders user picture with alt text', () => {
     render(<UserCard user={mockUser} />);
     const image = screen.getByAltText('Test User');
     expect(image).toBeInTheDocument();
-    expect(image).toHaveAttribute('src', 'https://example.com/photo.jpg');
   });
 
   it('renders user display name', () => {

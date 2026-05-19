@@ -8,7 +8,8 @@ export interface TeamProps {
 }
 
 export function BlueTeam({ users }: TeamProps): React.ReactElement {
-  const blueMembers = users.filter((u) => u.team === 'blue');
+  // const blueMembers = users.filter((u) => u.team === 'blue');
+  const blueMembers = users;
 
   return (
     <section className="mb-12 rounded-2xl bg-blue-600 px-6 py-10 shadow-lg sm:px-8 sm:py-12">

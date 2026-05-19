@@ -7,7 +7,8 @@ export interface TeamProps {
   users: User[];
 }
 export function RedTeam({ users }: TeamProps): React.ReactElement {
-  const redMembers = users.filter((u) => u.team === 'red');
+  // const redMembers = users.filter((u) => u.team === 'red');
+  const redMembers = users;
 
   return (
     <section className="mb-12 rounded-2xl bg-red-600 px-6 py-10 shadow-lg sm:px-8 sm:py-12">

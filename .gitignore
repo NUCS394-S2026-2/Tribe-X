@@ -6,7 +6,7 @@ dist-ssr
 node_modules/*
 coverage
 
-firebase.js
+firebase.ts
 .agents
 .firebase
 .claude/skills

@@ -3,17 +3,50 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as analyzeModule from '../../shared/api/analyzeMusicFile';
-import { MusicTags } from '../../shared/types/MusicTags';
+import * as chatModule from '../../shared/api/chatWithGemini';
+import type { AnalyzeResult, ChatResult } from '../../shared/types/MusicTags';
 import { AudioTagger } from './AudioTagger';
 
-const mockTags: MusicTags = {
-  trackId: 'test-track',
-  genres: ['Cinematic', 'Electronic'],
-  instruments: ['Synthesizer', 'Drums'],
-  vocalTraits: [],
-  soundsLike: ['Hans Zimmer'],
-  confidenceScore: 0.87,
-  lastUpdated: new Date('2026-01-01'),
+const mockResult: AnalyzeResult = {
+  audioContext: {
+    bpm: 124,
+    key: 'C major',
+    key_strength: 0.85,
+    energy_level: 'High',
+    tempo_feel: 'Upbeat',
+    danceability_score: 1.8,
+    harmonic_to_percussive_ratio: 0.71,
+    onset_density_per_second: 2.3,
+    instrument_hints: ['piano', 'drums'],
+    vocal_presence: false,
+    lyrics: null,
+  },
+  tags: {
+    genre: ['Electronic'],
+    instruments: ['Synth', 'Drums'],
+    lyricThemes: [],
+    mood: ['Cinematic', 'Atmospheric'],
+    tempo: 'Up-tempo',
+    type: [],
+    vocals: ['Instrumental'],
+    soundsLike: ['Hans Zimmer'],
+  },
+  conversationHistory: [
+    { role: 'model', parts: [{ text: 'This track has a high harmonic ratio.' }] },
+  ],
+};
+
+const mockChatResult: ChatResult = {
+  message: 'Updated the mood based on your feedback.',
+  updatedTags: {
+    ...mockResult.tags,
+    mood: ['Dark', 'Mysterious'],
+  },
+  conversationHistory: [
+    ...mockResult.conversationHistory,
+    { role: 'user', parts: [{ text: 'make it darker' }] },
+    { role: 'model', parts: [{ text: 'Updated the mood based on your feedback.' }] },
+  ],
 };
 
 describe('AudioTagger', () => {
@@ -25,7 +58,6 @@ describe('AudioTagger', () => {
     render(<AudioTagger />);
     expect(screen.getByLabelText(/select audio file/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /analyze/i })).toBeInTheDocument();
-    expect(screen.getByText(/music tags/i)).toBeInTheDocument();
   });
 
   it('disables the analyze button when no file is selected', () => {
@@ -33,7 +65,7 @@ describe('AudioTagger', () => {
     expect(screen.getByRole('button', { name: /analyze/i })).toBeDisabled();
   });
 
-  it('enables the analyze button after a file is selected', async () => {
+  it('enables the analyze button after a valid file is selected', async () => {
     render(<AudioTagger />);
     const input = screen.getByLabelText(/select audio file/i);
     const file = new File(['audio'], 'track.mp3', { type: 'audio/mpeg' });
@@ -41,9 +73,9 @@ describe('AudioTagger', () => {
     expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
   });
 
-  it('shows "Analyzing…" while loading and then populates the music tags display', async () => {
-    let resolveAnalyze!: (tags: MusicTags) => void;
-    const deferred = new Promise<MusicTags>((resolve) => {
+  it('shows "Analyzing…" while loading then displays tags', async () => {
+    let resolveAnalyze!: (result: AnalyzeResult) => void;
+    const deferred = new Promise<AnalyzeResult>((resolve) => {
       resolveAnalyze = resolve;
     });
     vi.spyOn(analyzeModule, 'analyzeMusicFile').mockReturnValue(deferred);
@@ -56,16 +88,15 @@ describe('AudioTagger', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
 
-    // While the promise is pending the button should show "Analyzing…" and be disabled
     expect(screen.getByRole('button', { name: /analyzing/i })).toBeDisabled();
 
-    resolveAnalyze(mockTags);
+    resolveAnalyze(mockResult);
 
     await waitFor(() => {
-      expect(screen.getByText('Cinematic')).toBeInTheDocument();
+      expect(screen.getByText('Electronic')).toBeInTheDocument();
     });
-    expect(screen.getByText('Synthesizer')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '87');
+    expect(screen.getByText('Cinematic')).toBeInTheDocument();
+    expect(screen.getByText('Hans Zimmer')).toBeInTheDocument();
   });
 
   it('shows an error message when analysis fails', async () => {
@@ -86,27 +117,50 @@ describe('AudioTagger', () => {
     });
   });
 
-  it('accepts valid audio files and enables analyze button', async () => {
+  it('shows the chat input after analysis completes', async () => {
+    vi.spyOn(analyzeModule, 'analyzeMusicFile').mockResolvedValue(mockResult);
     render(<AudioTagger />);
+
     const input = screen.getByLabelText(/select audio file/i);
+    await userEvent.upload(
+      input,
+      new File(['audio'], 'track.mp3', { type: 'audio/mpeg' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
 
-    // Test MP3
-    const mp3File = new File(['audio'], 'track.mp3', { type: 'audio/mpeg' });
-    await userEvent.upload(input, mp3File);
-    expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-
-    // Test WAV
-    const wavFile = new File(['audio'], 'track.wav', { type: 'audio/wav' });
-    await userEvent.upload(input, wavFile);
-    expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/make the mood darker/i)).toBeInTheDocument();
+    });
   });
 
-  it('rejects invalid file types and shows error message', async () => {
+  it('sends a chat message and updates tags', async () => {
+    vi.spyOn(analyzeModule, 'analyzeMusicFile').mockResolvedValue(mockResult);
+    vi.spyOn(chatModule, 'chatWithGemini').mockResolvedValue(mockChatResult);
+    render(<AudioTagger />);
+
+    const input = screen.getByLabelText(/select audio file/i);
+    await userEvent.upload(
+      input,
+      new File(['audio'], 'track.mp3', { type: 'audio/mpeg' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/make the mood darker/i)).toBeInTheDocument();
+    });
+
+    const chatInput = screen.getByPlaceholderText(/make the mood darker/i);
+    await userEvent.type(chatInput, 'make it darker');
+    await userEvent.click(screen.getByRole('button', { name: /send/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Dark')).toBeInTheDocument();
+    });
+  });
+
+  it('rejects invalid file types and shows error', async () => {
     render(<AudioTagger />);
     const input = screen.getByLabelText(/select audio file/i);
-
     const invalidFile = new File(['text'], 'document.exe', { type: 'text/plain' });
     await userEvent.upload(input, invalidFile);
 
@@ -116,34 +170,33 @@ describe('AudioTagger', () => {
     expect(screen.getByRole('button', { name: /analyze/i })).toBeDisabled();
   });
 
-  it('rejects files that are too large and shows error message', async () => {
+  it('rejects files that are too large', async () => {
     render(<AudioTagger />);
     const input = screen.getByLabelText(/select audio file/i);
-
-    // Create a file larger than 50MB
     const largeFile = new File(['x'.repeat(51 * 1024 * 1024)], 'large.mp3', {
       type: 'audio/mpeg',
     });
     await userEvent.upload(input, largeFile);
-
     expect(screen.getByRole('alert')).toHaveTextContent(/file too large/i);
     expect(screen.getByRole('button', { name: /analyze/i })).toBeDisabled();
   });
 
-  it('clears validation errors when a valid file is selected after an invalid one', async () => {
+  it('clears validation errors when a valid file replaces an invalid one', async () => {
     render(<AudioTagger />);
     const input = screen.getByLabelText(/select audio file/i);
 
-    // First upload invalid file
-    const invalidFile = new File(['text'], 'document.exe', { type: 'text/plain' });
-    await userEvent.upload(input, invalidFile);
+    await userEvent.upload(
+      input,
+      new File(['text'], 'document.exe', { type: 'text/plain' }),
+    );
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/unsupported file type/i);
     });
 
-    // Then upload valid file
-    const validFile = new File(['audio'], 'track.mp3', { type: 'audio/mpeg' });
-    await userEvent.upload(input, validFile);
+    await userEvent.upload(
+      input,
+      new File(['audio'], 'track.mp3', { type: 'audio/mpeg' }),
+    );
     await waitFor(() => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });

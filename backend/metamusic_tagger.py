@@ -51,7 +51,7 @@ def extract_essentia_features(audio_path: str) -> dict:
     audio = audio_full[:max_samples] if len(audio_full) > max_samples else audio_full
 
     # --- Rhythm ---
-    rhythm = es.RhythmExtractor2013(method="multifeature")
+    rhythm = es.RhythmExtractor2013(method="degara")
     bpm, beats, beats_confidence, _, beats_intervals = rhythm(audio)
 
     # --- Key & mode ---
@@ -89,12 +89,6 @@ def extract_essentia_features(audio_path: str) -> dict:
     duration      = len(audio) / 22050
     onset_density = len(onset_frames) / duration if duration > 0 else 0.0
 
-    # --- Chroma (pitch class distribution) via librosa ---
-    chroma     = librosa.feature.chroma_cqt(y=audio_lr, sr=22050)
-    chroma_mean = np.mean(chroma, axis=1)
-    pitch_classes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    top_notes  = [pitch_classes[i] for i in np.argsort(chroma_mean)[-3:][::-1]]
-
     # --- Tempo feel label ---
     tempo = float(bpm)
     if tempo < 70:
@@ -122,7 +116,6 @@ def extract_essentia_features(audio_path: str) -> dict:
         "key":              key,
         "mode":             scale,          # "major" or "minor" from Essentia
         "key_strength":     float(key_strength),
-        "top_notes":        ", ".join(top_notes),
         "rms":              rms,
         "energy":           energy,
         "loudness":         loudness,

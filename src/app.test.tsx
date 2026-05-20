@@ -59,7 +59,6 @@ describe('App component', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/select audio file/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /analyze/i })).toBeInTheDocument();
-      expect(screen.getByText(/music tags/i)).toBeInTheDocument();
     });
   });
 

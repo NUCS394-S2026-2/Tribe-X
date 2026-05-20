@@ -43,38 +43,57 @@ _client = genai.Client(api_key=_GEMINI_API_KEY) if _GEMINI_API_KEY else None
 SUPPORTED = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aiff", ".aif"}
 
 DISCO_TAXONOMY = """
-Genre (pick 1-2): Ambient, Blues, Classical, Country, Dance, Electronic, Folk, Funk, Hip-hop/rap, Indie, Jazz, Latin, Metal, Pop, Punk, R&B, Reggae, Rock, Singer/songwriter, Soul, Vintage, World
+Genre (pick 1-2 that best fit — be specific, avoid defaulting to the most obvious):
+Ambient, Blues, Classical, Country, Dance, Electronic, Folk, Funk, Hip-hop/rap, Indie, Jazz, Latin, Metal, Pop, Punk, R&B, Reggae, Rock, Singer/songwriter, Soul, Vintage, World
 
-Instruments (pick relevant): Acoustic guitar, Bass, Clarinet, Drums, Electric guitar, Flute, Horns, Keyboard, Orchestral, Percussion, Piano, Saxophone, Strings, Synth, Trumpet
+Instruments (pick 2-4 most prominent — only what is clearly audible, not guesses):
+Acoustic guitar, Bass, Clarinet, Drums, Electric guitar, Flute, Horns, Keyboard, Orchestral, Percussion, Piano, Saxophone, Strings, Synth, Trumpet
 
-Lyric Themes (pick relevant, only if vocals present — leave empty [] for instrumental): Adventure, Ambition, Betrayal, Celebration, Change, Confidence, Conflict, Connection, Death, Desire, Destiny, Discovery, Dream, Empowerment, Energy, Escape, Faith, Family, Fear, Freedom, Friendship, Fun, Gratitude, Happiness, Heartbreak, Home, Hope, Identity, Individuality, Life, Loneliness, Longing, Loss, Love, Money, Nature, New beginning, Nostalgia, Pain, Party, Power, Rebellion, Regret, Relationship, Romance, Strength, Struggle, Success, Survival, Time, Together, Unity
+Lyric Themes (pick 1-3, only if vocals are present — leave empty [] for instrumental tracks):
+Adventure, Ambition, Betrayal, Celebration, Change, Confidence, Conflict, Connection, Death, Desire, Destiny, Discovery, Dream, Empowerment, Energy, Escape, Faith, Family, Fear, Freedom, Friendship, Fun, Gratitude, Happiness, Heartbreak, Home, Hope, Identity, Individuality, Life, Loneliness, Longing, Loss, Love, Money, Nature, New beginning, Nostalgia, Pain, Party, Power, Rebellion, Regret, Relationship, Romance, Strength, Struggle, Success, Survival, Time, Together, Unity
 
-Mood/Feel (pick 3-5): Anthemic, Atmospheric, Bright, Building, Catchy, Cinematic, Confident, Cool, Dark, Dramatic, Dreamy, Driving, Emotive, Energetic, Epic, Fun, Gritty, Happy, Hopeful, Intense, Light, Minimal, Moody, Mysterious, Party, Percussive, Playful, Positive, Powerful, Quirky, Reflective, Retro, Rhythmic, Romantic, Sad, Sexy, Swagger, Tension, Upbeat, Uplifting, Warm
+Mood/Feel (pick 3-4 that are genuinely distinctive for this track — avoid generic defaults):
+Anthemic, Atmospheric, Bright, Building, Catchy, Cinematic, Confident, Cool, Dark, Dramatic, Dreamy, Driving, Emotive, Energetic, Epic, Fun, Gritty, Happy, Hopeful, Intense, Light, Minimal, Moody, Mysterious, Party, Percussive, Playful, Positive, Powerful, Quirky, Reflective, Retro, Rhythmic, Romantic, Sad, Sexy, Swagger, Tension, Upbeat, Uplifting, Warm
 
-Tempo (pick 1): Downtempo, Fast, Midtempo, Slow, Up-tempo
+Tempo (pick exactly 1):
+Downtempo, Fast, Midtempo, Slow, Up-tempo
 
-Type (leave as empty [] — Robert fills these manually): Cover, Demo, Easy-clear, Focus track, Mainstream, One stop, Recognizable, Rerecord, Samples, Score, Sound design, Soundtrack
+Type (leave as empty [] — the artist fills these manually):
+Cover, Demo, Easy-clear, Focus track, Mainstream, One stop, Recognizable, Rerecord, Samples, Score, Sound design, Soundtrack
 
-Vocals (pick relevant): A cappella, Aahs, Background vocals, Choir, Clean, Duet, Explicit, Female vocal, Foreign language, Harmonies, Instrumental, Male vocal, Oohs, Whispering, Whistling
+Vocals (pick 1-2 most accurate descriptors):
+A cappella, Aahs, Background vocals, Choir, Clean, Duet, Explicit, Female vocal, Foreign language, Harmonies, Instrumental, Male vocal, Oohs, Whispering, Whistling
 
-Sounds Like (infer 3-5 artist names from the audio characteristics)
+Sounds Like (2-3 artist names — pick artists a music supervisor would actually recognise and search for):
 """
 
 _PROMPT_TEMPLATE = """\
 You are a music metadata expert specializing in sync licensing for film and TV.
 
-You have analyzed this track and found the following audio characteristics:
+A track has been analyzed with audio feature extraction software. \
+Here are the measured characteristics:
 {audio_context}
 
-Your job is to suggest metadata tags for the Disco sync licensing platform.
-You must populate all 7 categories below.
-The pre-set tag lists are vocabulary guidance — use them where they fit, draw \
-inspiration from them, or create new tags if nothing fits.
-Tags should be meaningful to a music supervisor searching for tracks.
-Categories are fixed; tag values are flexible.
+Field reference:
+- bpm: tempo in beats per minute
+- key / mode: detected musical key and whether major or minor
+- key_strength: confidence in key detection (0-1, higher = more certain)
+- energy_level: perceived loudness/intensity label
+- tempo_feel: subjective pacing label derived from BPM
+- danceability_score: Essentia danceability (0-3 scale, higher = more danceable)
+- harmonic_to_percussive_ratio: proportion of signal that is harmonic vs percussive (0-1, \
+higher = more melodic/harmonic, lower = more beat/noise driven)
+- onset_density_per_second: rhythmic event density (higher = busier, more complex rhythm)
+- instrument_hints: rough instrument guesses from spectral analysis — treat as hints, not facts
+- vocal_presence: estimated boolean from spectral features — may not be perfectly accurate
+
+Your job is to suggest Disco sync licensing tags for this track.
+Choose tags that would help a music supervisor find this track in a search.
+Be specific and deliberate — favour precision over breadth.
+Categories are fixed; tag values can use the vocabulary below, draw from it, or be new if nothing fits.
 Return ONLY a valid JSON object — no markdown fences, no text outside the JSON.
 
-CATEGORIES AND VOCABULARY GUIDANCE:
+CATEGORIES AND VOCABULARY:
 {taxonomy}
 
 Return exactly this JSON shape:
@@ -87,7 +106,10 @@ Return exactly this JSON shape:
   "type": [],
   "vocals": ["string"],
   "soundsLike": ["string"],
-  "reasoning": "one sentence explaining your main choices"
+  "reasoning": "2-3 sentences explaining the musical logic behind your choices — \
+reference the specific measured features (BPM, key, harmonic ratio, onset density etc.) \
+and explain what they suggest about the track's character. Do NOT repeat or list the tags \
+you chose — explain the reasoning that led to them."
 }}
 """
 

@@ -12,11 +12,12 @@ export interface DiscoTags {
 export interface AudioContext {
   bpm: number;
   key: string;
-  mode: string;
+  key_strength: number;
   energy_level: string;
   tempo_feel: string;
-  danceability: string;
-  harmonic_ratio: string;
+  danceability_score: number;
+  harmonic_to_percussive_ratio: number;
+  onset_density_per_second: number;
   instrument_hints: string[];
   vocal_presence: boolean;
   lyrics: string | null;

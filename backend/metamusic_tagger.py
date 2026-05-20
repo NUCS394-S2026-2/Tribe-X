@@ -406,34 +406,25 @@ def _estimate_vocal_presence(f: dict) -> bool:
 
 
 def build_audio_context(f: dict) -> dict:
-    """Convert raw Essentia features into human-readable audio_context for Gemini."""
-    dance = f["danceability"]
-    if dance > 1.8:
-        dance_label = "high"
-    elif dance > 0.9:
-        dance_label = "medium"
-    else:
-        dance_label = "low"
+    """Build human-interpretable audio_context for the LLM.
 
-    hr = f["harmonic_ratio"]
-    if hr > 0.65:
-        harm_label = "melodic-dominant"
-    elif hr > 0.45:
-        harm_label = "balanced"
-    else:
-        harm_label = "percussive-dominant"
-
+    Raw values are passed where the LLM can reason about them directly
+    (BPM, key strength, harmonic ratio, onset density). Labels are kept
+    where the raw signal number is too esoteric to be meaningful
+    (energy level, tempo feel).
+    """
     return {
-        "bpm":              round(f["tempo"], 1),
-        "key":              f"{f['key']} {f['mode']}",
-        "mode":             f["mode"],
-        "energy_level":     f["energy_level"],
-        "tempo_feel":       f["tempo_feel"],
-        "danceability":     dance_label,
-        "harmonic_ratio":   harm_label,
-        "instrument_hints": _infer_instrument_hints(f),
-        "vocal_presence":   _estimate_vocal_presence(f),
-        "lyrics":           None,
+        "bpm":                        round(f["tempo"], 1),
+        "key":                        f"{f['key']} {f['mode']}",
+        "key_strength":               round(f["key_strength"], 2),
+        "energy_level":               f["energy_level"],
+        "tempo_feel":                 f["tempo_feel"],
+        "danceability_score":         round(float(f["danceability"]), 2),
+        "harmonic_to_percussive_ratio": round(f["harmonic_ratio"], 2),
+        "onset_density_per_second":   round(f["onset_density"], 2),
+        "instrument_hints":           _infer_instrument_hints(f),
+        "vocal_presence":             _estimate_vocal_presence(f),
+        "lyrics":                     None,
     }
 
 

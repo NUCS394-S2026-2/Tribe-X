@@ -1,7 +1,12 @@
 import React, { useRef, useState } from 'react';
 
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
-import type { MusicTags } from '../../shared/types/MusicTags';
+import { chatWithGemini } from '../../shared/api/chatWithGemini';
+import type {
+  AudioContext,
+  ConversationMessage,
+  DiscoTags,
+} from '../../shared/types/MusicTags';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const SUPPORTED_TYPES = new Set([
@@ -72,43 +77,19 @@ function TagRow({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-function ConfidenceBar({ score }: { score: number }) {
-  const pct = Math.round(score * 100);
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          Confidence
-        </span>
-        <span className="text-xs font-semibold text-green-600">{pct}%</span>
-      </div>
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
-        <div
-          className="h-full rounded-full bg-green-500 transition-all duration-500"
-          style={{ width: `${pct}%` }}
-          role="progressbar"
-          aria-valuenow={pct}
-          aria-valuemin={0}
-          aria-valuemax={100}
-        />
-      </div>
-    </div>
-  );
-}
-
-function formatTagsForClipboard(tags: MusicTags): string {
-  const pct = Math.round(tags.confidenceScore * 100);
-  const lines: string[] = [
-    `Genres: ${tags.genres.join(', ') || '(none)'}`,
+function formatTagsForClipboard(tags: DiscoTags): string {
+  return [
+    `Genre: ${tags.genre.join(', ') || '(none)'}`,
     `Instruments: ${tags.instruments.join(', ') || '(none)'}`,
-    `Vocal Traits: ${tags.vocalTraits.join(', ') || '(none)'}`,
-    `Sounds Like: ${(tags.soundsLike ?? []).join(', ') || '(none)'}`,
-    `Confidence: ${pct}%`,
-  ];
-  return lines.join('\n');
+    `Lyric Themes: ${tags.lyricThemes.join(', ') || '(none)'}`,
+    `Mood/Feel: ${tags.mood.join(', ') || '(none)'}`,
+    `Tempo: ${tags.tempo || '(none)'}`,
+    `Vocals: ${tags.vocals.join(', ') || '(none)'}`,
+    `Sounds Like: ${tags.soundsLike.join(', ') || '(none)'}`,
+  ].join('\n');
 }
 
-function CopyButton({ tags }: { tags: MusicTags }) {
+function CopyButton({ tags }: { tags: DiscoTags }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -123,39 +104,12 @@ function CopyButton({ tags }: { tags: MusicTags }) {
       className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm transition-colors duration-150 hover:border-team-blue hover:text-team-blue focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-team-blue"
       aria-label="Copy tags to clipboard"
     >
-      {copied ? (
-        <>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="h-3.5 w-3.5 text-green-500"
-          >
-            <path
-              fillRule="evenodd"
-              d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className="text-green-600">Copied!</span>
-        </>
-      ) : (
-        <>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="h-3.5 w-3.5"
-          >
-            <path d="M3.5 2A1.5 1.5 0 0 0 2 3.5v9A1.5 1.5 0 0 0 3.5 14h5.793a1.5 1.5 0 0 0 1.06-.44l2.707-2.706A1.5 1.5 0 0 0 13.5 9.75V6.5A1.5 1.5 0 0 0 12 5h-1V3.5A1.5 1.5 0 0 0 9.5 2h-6ZM9.5 6.5H12l-2.5 2.5V6.5Z" />
-          </svg>
-        </>
-      )}
+      {copied ? <span className="text-green-600">Copied!</span> : <span>Copy</span>}
     </button>
   );
 }
 
-function MusicTagsDisplay({ tags }: { tags: MusicTags }) {
+function MusicTagsDisplay({ tags }: { tags: DiscoTags }) {
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
       <div className="flex items-center justify-between">
@@ -164,19 +118,104 @@ function MusicTagsDisplay({ tags }: { tags: MusicTags }) {
         </span>
         <CopyButton tags={tags} />
       </div>
-      <TagRow label="Genres" items={tags.genres} />
+      <TagRow label="Genre" items={tags.genre} />
       <TagRow label="Instruments" items={tags.instruments} />
-      <TagRow label="Vocal Traits" items={tags.vocalTraits} />
-      <TagRow label="Sounds Like" items={tags.soundsLike ?? []} />
-      <ConfidenceBar score={tags.confidenceScore} />
+      <TagRow label="Mood / Feel" items={tags.mood} />
+      <TagRow label="Vocals" items={tags.vocals} />
+      <TagRow label="Lyric Themes" items={tags.lyricThemes} />
+      <TagRow label="Tempo" items={tags.tempo ? [tags.tempo] : []} />
+      <TagRow label="Sounds Like" items={tags.soundsLike} />
+    </div>
+  );
+}
+
+interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
+function ChatSection({
+  chatMessages,
+  onSend,
+  loading,
+}: {
+  chatMessages: ChatMessage[];
+  onSend: (message: string) => void;
+  loading: boolean;
+}) {
+  const [input, setInput] = useState('');
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const trimmed = input.trim();
+    if (!trimmed || loading) return;
+    onSend(trimmed);
+    setInput('');
+  };
+
+  return (
+    <div className="mt-6 flex flex-col gap-3">
+      <p className="text-sm font-semibold text-gray-700">Refine with Chat</p>
+
+      {chatMessages.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3">
+          {chatMessages.map((msg, i) => (
+            <div
+              key={i}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <span
+                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                  msg.role === 'user'
+                    ? 'bg-team-blue text-black'
+                    : 'bg-white text-gray-700 border border-gray-200'
+                }`}
+              >
+                {msg.text}
+              </span>
+            </div>
+          ))}
+          {loading && (
+            <div className="flex justify-start">
+              <span className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-400 italic">
+                Thinking…
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder='e.g. "make the mood darker" or "reconsider the genre"'
+          disabled={loading}
+          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-team-blue focus:outline-none disabled:opacity-50"
+        />
+        <button
+          type="submit"
+          disabled={!input.trim() || loading}
+          className="rounded-lg bg-team-blue px-4 py-2 text-sm font-semibold text-black shadow-sm transition-all duration-200 hover:bg-team-blue/90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 }
 
 export function AudioTagger(): React.ReactElement {
   const [file, setFile] = useState<File | null>(null);
-  const [tags, setTags] = useState<MusicTags | null>(null);
+  const [tags, setTags] = useState<DiscoTags | null>(null);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>(
+    [],
+  );
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<FileValidationError | null>(
     null,
@@ -187,6 +226,9 @@ export function AudioTagger(): React.ReactElement {
     const selected = e.target.files?.[0] ?? null;
     setFile(selected);
     setTags(null);
+    setAudioContext(null);
+    setConversationHistory([]);
+    setChatMessages([]);
     setError(null);
     setValidationError(null);
 
@@ -205,11 +247,36 @@ export function AudioTagger(): React.ReactElement {
     setError(null);
     try {
       const result = await analyzeMusicFile(file);
-      setTags(result);
+      setTags(result.tags);
+      setAudioContext(result.audioContext);
+      setConversationHistory(result.conversationHistory);
+      setChatMessages(
+        result.conversationHistory.map((m) => ({
+          role: m.role,
+          text: m.parts[0]?.text ?? '',
+        })),
+      );
     } catch {
       setError('Analysis failed. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChat = async (message: string) => {
+    if (!audioContext) return;
+    setChatMessages((prev) => [...prev, { role: 'user', text: message }]);
+    setChatLoading(true);
+    setError(null);
+    try {
+      const result = await chatWithGemini(message, conversationHistory, audioContext);
+      setTags(result.updatedTags);
+      setConversationHistory(result.conversationHistory);
+      setChatMessages((prev) => [...prev, { role: 'model', text: result.message }]);
+    } catch {
+      setError('Chat failed. Please try again.');
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -270,6 +337,11 @@ export function AudioTagger(): React.ReactElement {
           {tags ? (
             <div className="mt-2">
               <MusicTagsDisplay tags={tags} />
+              <ChatSection
+                chatMessages={chatMessages}
+                onSend={handleChat}
+                loading={chatLoading}
+              />
             </div>
           ) : (
             <p className="mt-2 text-sm text-gray-400 italic">

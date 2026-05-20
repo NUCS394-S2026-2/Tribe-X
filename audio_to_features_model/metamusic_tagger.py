@@ -40,15 +40,14 @@ except ImportError:
 # Essentia feature extraction
 # ---------------------------------------------------------------------------
 
-ANALYSIS_DURATION = 30  # seconds — analyse first 30s for speed
-
-
 def extract_essentia_features(audio_path: str) -> dict:
-    # Load audio — Essentia uses float32, mono, capped at ANALYSIS_DURATION
-    loader = es.MonoLoader(filename=audio_path, sampleRate=22050)
-    audio_full = loader()
-    max_samples = ANALYSIS_DURATION * 22050
-    audio = audio_full[:max_samples] if len(audio_full) > max_samples else audio_full
+    """
+    Extract audio features using Essentia algorithms.
+    Returns a dictionary of measurements.
+    """
+    # Load audio — Essentia uses float32, mono
+    loader = es.MonoLoader(filename=audio_path, sampleRate=44100)
+    audio = loader()
 
     # --- Rhythm ---
     rhythm = es.RhythmExtractor2013(method="multifeature")
@@ -62,7 +61,7 @@ def extract_essentia_features(audio_path: str) -> dict:
     rms        = float(np.sqrt(np.mean(audio ** 2)))
     loudness   = float(es.Loudness()(audio))
 
-    # --- Danceability ---
+    # --- Danceability (0 = not danceable, 3 = very danceable) ---
     danceability, _ = es.Danceability()(audio)
 
     # --- Spectral centroid (brightness) ---
@@ -71,14 +70,22 @@ def extract_essentia_features(audio_path: str) -> dict:
     # --- Zero crossing rate ---
     zcr = float(es.ZeroCrossingRate()(audio))
 
-    # --- MFCCs via librosa (vectorised, much faster than frame loop) ---
-    mfcc_mean = np.mean(
-        librosa.feature.mfcc(y=audio.astype(np.float32), sr=22050, n_mfcc=13),
-        axis=1,
-    )
+    # --- MFCCs (frame-by-frame, then average) ---
+    window    = es.Windowing(type='hann')
+    spectrum  = es.Spectrum()
+    mfcc_algo = es.MFCC(numberCoefficients=13)
+
+    mfcc_frames = []
+    for frame in es.FrameGenerator(audio, frameSize=2048, hopSize=512, startFromZero=True):
+        spec = spectrum(window(frame))
+        _, mfcc_frame = mfcc_algo(spec)
+        mfcc_frames.append(mfcc_frame)
+
+    mfcc_mean = np.mean(mfcc_frames, axis=0) if mfcc_frames else np.zeros(13)
 
     # --- Harmonic / percussive ratio via librosa HPSS ---
-    audio_lr = audio.astype(np.float32)
+    # Resample to 22050 for librosa
+    audio_lr = librosa.resample(audio.astype(np.float32), orig_sr=44100, target_sr=22050)
     y_harm, y_perc = librosa.effects.hpss(audio_lr)
     harm_rms = float(np.mean(librosa.feature.rms(y=y_harm)))
     perc_rms = float(np.mean(librosa.feature.rms(y=y_perc)))
@@ -86,7 +93,7 @@ def extract_essentia_features(audio_path: str) -> dict:
 
     # --- Onset density ---
     onset_frames  = librosa.onset.onset_detect(y=audio_lr, sr=22050)
-    duration      = len(audio) / 22050
+    duration      = len(audio) / 44100
     onset_density = len(onset_frames) / duration if duration > 0 else 0.0
 
     # --- Chroma (pitch class distribution) via librosa ---
@@ -362,82 +369,6 @@ def generate_tags(genre, subgenre, mood_list, instruments, vocals,
 
 
 # ---------------------------------------------------------------------------
-# Audio context builder (feeds Gemini)
-# ---------------------------------------------------------------------------
-
-def _infer_instrument_hints(f: dict) -> list:
-    hr  = f["harmonic_ratio"]
-    sc  = f["spectral_centroid"]
-    zcr = f["zcr"]
-    rms = f["rms"]
-    od  = f["onset_density"]
-
-    hints = []
-    if hr > 0.60 and sc > 3000:
-        hints.append("synth lead")
-    elif hr > 0.60 and sc < 1500:
-        hints.append("piano")
-    elif hr > 0.55:
-        hints.append("keyboard")
-
-    if od < 2.0 and hr > 0.50:
-        hints.append("synth pad")
-
-    if sc < 1500 and rms > 0.03:
-        hints.append("bass")
-
-    if hr < 0.45 or od > 3.0:
-        hints.append("drums")
-
-    if 0.04 < zcr < 0.08 and hr > 0.50 and 1500 <= sc <= 3000:
-        hints.append("guitar")
-
-    return hints[:4] or ["synth", "drums"]
-
-
-def _estimate_vocal_presence(f: dict) -> bool:
-    score = sum([
-        0.05 < f["zcr"] < 0.15,
-        1000 < f["spectral_centroid"] < 3500,
-        0.35 < f["harmonic_ratio"] < 0.70,
-        -50 < float(f["mfcc"][1]) < 100,
-    ])
-    return score >= 3
-
-
-def build_audio_context(f: dict) -> dict:
-    """Convert raw Essentia features into human-readable audio_context for Gemini."""
-    dance = f["danceability"]
-    if dance > 1.8:
-        dance_label = "high"
-    elif dance > 0.9:
-        dance_label = "medium"
-    else:
-        dance_label = "low"
-
-    hr = f["harmonic_ratio"]
-    if hr > 0.65:
-        harm_label = "melodic-dominant"
-    elif hr > 0.45:
-        harm_label = "balanced"
-    else:
-        harm_label = "percussive-dominant"
-
-    return {
-        "bpm":              round(f["tempo"], 1),
-        "key":              f"{f['key']} {f['mode']}",
-        "mode":             f["mode"],
-        "energy_level":     f["energy_level"],
-        "tempo_feel":       f["tempo_feel"],
-        "danceability":     dance_label,
-        "harmonic_ratio":   harm_label,
-        "instrument_hints": _infer_instrument_hints(f),
-        "vocal_presence":   _estimate_vocal_presence(f),
-        "lyrics":           None,
-    }
-
-
-# ---------------------------------------------------------------------------
 # Main tagger class
 # ---------------------------------------------------------------------------
 
@@ -448,17 +379,9 @@ class MetaMusicTagger:
     """
 
     def tag_file(self, audio_path: str) -> dict:
-        """Run Essentia and return a human-readable audio_context dict for Gemini."""
         filename = os.path.basename(audio_path)
         print(f"  [essentia] {filename}")
-        f = extract_essentia_features(audio_path)
-        ctx = build_audio_context(f)
-        print(f"  [context]  {filename} → {ctx['bpm']} BPM | {ctx['key']} | {ctx['energy_level']}")
-        return ctx
 
-    def tag_file_legacy(self, audio_path: str) -> dict:
-        """Original rule-based tagger — kept for reference."""
-        filename = os.path.basename(audio_path)
         f = extract_essentia_features(audio_path)
 
         genre, subgenre   = classify_genre(f)
@@ -470,6 +393,8 @@ class MetaMusicTagger:
             genre, subgenre, mood_list, instruments, vocals,
             f["tempo_feel"], f["energy_level"], f["mode"], f["key"], f["danceability"]
         )
+
+        print(f"  [tags]     {filename} → {genre} | {', '.join(mood_list)}")
 
         return {
             "filename":         filename,

@@ -440,37 +440,7 @@ class MetaMusicTagger:
         print(f"  [context]  {filename} → {ctx['bpm']} BPM | {ctx['key']} | {ctx['energy_level']}")
         return ctx
 
-    def tag_file_legacy(self, audio_path: str) -> dict:
-        """Original rule-based tagger — kept for reference."""
-        filename = os.path.basename(audio_path)
-        f = extract_essentia_features(audio_path)
 
-        genre, subgenre   = classify_genre(f)
-        mood_list         = classify_mood(f)
-        instruments       = classify_instrumentation(f)
-        vocals            = classify_vocals(f)
-        sync_use_cases    = classify_sync_use_cases(genre, mood_list, f)
-        tags              = generate_tags(
-            genre, subgenre, mood_list, instruments, vocals,
-            f["tempo_feel"], f["energy_level"], f["mode"], f["key"], f["danceability"]
-        )
-
-        return {
-            "filename":         filename,
-            "tempo_bpm":        round(f["tempo"], 1),
-            "key":              f"{f['key']} {f['mode'].capitalize()}",
-            "key_strength":     round(f["key_strength"], 2),
-            "danceability":     round(f["danceability"], 2),
-            "energy_level":     f["energy_level"],
-            "tempo_feel":       f["tempo_feel"],
-            "genre":            genre,
-            "subgenre":         subgenre,
-            "mood":             ", ".join(mood_list),
-            "instrumentation":  ", ".join(instruments),
-            "vocals":           vocals,
-            "sync_use_cases":   " | ".join(sync_use_cases),
-            "tags":             ", ".join(tags),
-        }
 
     def tag_folder(self, folder_path: str,
                    output_path: str = "metamusic_output.xlsx") -> pd.DataFrame:

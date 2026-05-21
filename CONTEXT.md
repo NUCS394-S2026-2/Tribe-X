@@ -386,8 +386,11 @@ the relevant tag categories.
 ## Decisions on Infrastructure
 
 1. **DB + Auth**: Firebase Auth + Firestore
-2. **Audio file storage**: Firebase Storage — store the raw MP3 + final tags.
-   Do NOT store audio_context in DB (saves cost/complexity).
-   Instead, add a [ Re-analyze ] button that re-runs Essentia on the saved MP3
-   to regenerate audio_context on demand before starting a chat session.
+2. **Storage strategy**:
+   - Store the raw MP3 in Firebase Storage.
+   - Store track metadata and final tags in Firestore.
+   - Do **not** persist `audio_context` in Firestore or any other DB.
+     To start a chat/refinement session, add a [ Re-analyze ] button that
+     re-runs Essentia on the saved MP3 and regenerates `audio_context`
+     on demand.
 3. **Direct tag editing**: Always through chat. Inline editing is a stretch goal.

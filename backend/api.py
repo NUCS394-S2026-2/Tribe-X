@@ -18,7 +18,7 @@ import uvicorn
 load_dotenv()
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, field_validator
 
 from metamusic_tagger import MetaMusicTagger
 
@@ -114,6 +114,38 @@ you chose — explain the reasoning that led to them."
 """
 
 
+class DiscoTags(BaseModel):
+    genre: list[str] = []
+    instruments: list[str] = []
+    lyricThemes: list[str] = []
+    mood: list[str] = []
+    tempo: str = "Midtempo"
+    type: list[str] = []
+    vocals: list[str] = []
+    soundsLike: list[str] = []
+
+    @field_validator("genre", "instruments", "lyricThemes", "mood", "type", "vocals", "soundsLike", mode="before")
+    @classmethod
+    def coerce_list(cls, v):
+        if isinstance(v, str):
+            return [v]
+        return v if v is not None else []
+
+    @field_validator("tempo", mode="before")
+    @classmethod
+    def coerce_tempo(cls, v):
+        if isinstance(v, list):
+            return v[0] if v else "Midtempo"
+        return v if isinstance(v, str) and v else "Midtempo"
+
+
+def _validate_tags(raw: dict) -> dict:
+    try:
+        return DiscoTags(**raw).model_dump()
+    except ValidationError as e:
+        raise HTTPException(status_code=502, detail=f"Gemini response failed schema validation: {e}")
+
+
 def _extract_json(text: str) -> dict:
     text = re.sub(r"```(?:json)?\s*", "", text).strip().rstrip("`")
     return json.loads(text)
@@ -163,9 +195,10 @@ async def analyze(file: UploadFile = File(...)):
         os.unlink(tmp_path)
 
     print("[analyze] calling Gemini...")
-    tags = _call_gemini(audio_context)
-    print(f"[analyze] Gemini returned: {tags}")
-    reasoning = tags.pop("reasoning", "")
+    raw_tags = _call_gemini(audio_context)
+    print(f"[analyze] Gemini returned: {raw_tags}")
+    reasoning = raw_tags.pop("reasoning", "")
+    tags = _validate_tags(raw_tags)
 
     return {
         "audioContext": audio_context,
@@ -212,8 +245,9 @@ async def chat(req: ChatRequest):
             ),
         )
         response = chat_session.send_message(req.message)
-        tags = _extract_json(response.text)
-        reasoning = tags.pop("reasoning", "")
+        raw_tags = _extract_json(response.text)
+        reasoning = raw_tags.pop("reasoning", "")
+        tags = _validate_tags(raw_tags)
 
         updated_history = req.conversationHistory + [
             {"role": "user",  "parts": [{"text": req.message}]},

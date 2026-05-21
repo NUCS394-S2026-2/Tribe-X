@@ -60,24 +60,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  /**
-   * Initialize auth state listener.
-   * On sign-in, creates or fetches the Firestore User document.
-   */
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (firebaseUser) {
-          const userData = await ensureUserDocument(firebaseUser);
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Unblock the UI immediately using data already in Firebase Auth.
+        setUser(mapFirebaseUserToUser(firebaseUser));
         setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Auth initialization failed'));
+        setLoading(false);
+        // Ensure the Firestore document exists in the background.
+        ensureUserDocument(firebaseUser).catch((err) => {
+          setError(err instanceof Error ? err : new Error('Auth initialization failed'));
+        });
+      } else {
         setUser(null);
-      } finally {
+        setError(null);
         setLoading(false);
       }
     });

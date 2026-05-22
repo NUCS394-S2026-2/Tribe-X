@@ -5,7 +5,15 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 
 function AppContent(): React.ReactElement {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-team-blue" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -17,15 +25,17 @@ function AppContent(): React.ReactElement {
           </div>
         </div>
       ) : (
-        <>
-          <div className="flex items-center justify-between bg-white p-4 shadow">
+        <div className="flex h-screen flex-col">
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-3 shadow-sm">
             <p className="text-sm text-gray-600">
               Signed in as <span className="font-semibold">{user.displayName}</span>
             </p>
             <SignOutButton />
           </div>
-          <AudioTagger />
-        </>
+          <div className="flex flex-1 overflow-hidden">
+            <AudioTagger />
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,3 +1,46 @@
+export interface DiscoTags {
+  genre: string[];
+  instruments: string[];
+  lyricThemes: string[];
+  mood: string[];
+  tempo: string;
+  type: string[];
+  vocals: string[];
+  soundsLike: string[];
+}
+
+export interface AudioContext {
+  bpm: number;
+  key: string;
+  key_strength: number;
+  energy_level: string;
+  tempo_feel: string;
+  danceability_score: number;
+  harmonic_to_percussive_ratio: number;
+  onset_density_per_second: number;
+  instrument_hints: string[];
+  vocal_presence: boolean;
+  lyrics: string | null;
+}
+
+export interface ConversationMessage {
+  role: 'user' | 'model';
+  parts: { text: string }[];
+}
+
+export interface AnalyzeResult {
+  audioContext: AudioContext;
+  tags: DiscoTags;
+  conversationHistory: ConversationMessage[];
+}
+
+export interface ChatResult {
+  message: string;
+  updatedTags: DiscoTags;
+  conversationHistory: ConversationMessage[];
+}
+
+/** @deprecated — kept so old tests compile while we migrate */
 export interface MusicTags {
   trackId: string;
   genres: string[];

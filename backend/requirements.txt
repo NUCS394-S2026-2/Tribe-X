@@ -1,30 +1,28 @@
-# Audio Semantic Tagging System - Requirements
 
-# Core Audio Processing
 librosa>=0.11.0
 soundfile>=0.12.1
 
-# Essentia — feature extraction and audio analysis (REQUIRED for metamusic_tagger.py)
 essentia
 
-# Data Processing
 pandas>=2.0.0
 numpy>=1.24.0
 
-# Machine Learning
+
 scikit-learn>=1.3.0
 
-# Visualization
+
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# Excel Support
+
 openpyxl>=3.1.0
 
-# Signal Processing
+
 scipy>=1.10.0
 
-# HTTP API server (api.py)
+
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 python-multipart>=0.0.9
+google-genai>=2.4.0
+python-dotenv>=1.0.0

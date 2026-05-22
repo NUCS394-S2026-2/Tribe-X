@@ -40,9 +40,9 @@ export function UploadPage({
   onReset,
 }: UploadPageProps): ReactElement {
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-4">
-      <div className="mx-auto flex max-w-[880px] flex-col gap-3">
-        <section className="grid items-center gap-3 lg:grid-cols-[1fr_250px]">
+    <div className="flex-1 overflow-y-auto px-8 py-4">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3">
+        <section className="grid items-center gap-4 lg:grid-cols-[1fr_320px]">
           <div>
             <h2 className="text-3xl font-bold leading-tight tracking-tight text-slate-950">
               Upload a track.

@@ -321,7 +321,7 @@ function ChatInputBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/60 p-2 shadow-sm"
+      className="flex items-center gap-2.5 rounded-xl border border-violet-200/70 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-2 shadow-sm shadow-violet-100/70"
     >
       <div className="min-w-0 flex-1 px-1">
         <label
@@ -335,7 +335,7 @@ function ChatInputBar({
           type="text"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Tell the AI what to adjust."
+          placeholder='e.g. "make the mood darker"'
           disabled={loading}
           className="mt-0.5 w-full border-0 bg-transparent text-sm text-slate-500 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
         />
@@ -343,7 +343,7 @@ function ChatInputBar({
       <button
         type="submit"
         disabled={!input.trim() || loading}
-        className="rounded-lg bg-violet-100 px-4 py-2 text-sm font-bold text-violet-500 transition-colors hover:bg-violet-200 hover:text-violet-600 disabled:cursor-not-allowed disabled:bg-violet-50 disabled:text-violet-300 disabled:opacity-100"
+        className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#5b50b6] px-4 py-2 text-sm font-bold text-white shadow-sm shadow-violet-200 transition hover:brightness-105 disabled:cursor-not-allowed disabled:from-violet-100 disabled:to-violet-100 disabled:text-violet-300 disabled:shadow-none"
       >
         Send
       </button>

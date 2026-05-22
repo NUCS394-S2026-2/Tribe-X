@@ -1,5 +1,4 @@
 import { AudioTagger } from './components/audio-tagger/AudioTagger';
-import { SignOutButton } from './components/SignOutButton/SignOutButton';
 import { SignUpButton } from './components/SignUpButton/SignUpButton';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
@@ -25,16 +24,8 @@ function AppContent(): React.ReactElement {
           </div>
         </div>
       ) : (
-        <div className="flex h-screen flex-col">
-          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-3 shadow-sm">
-            <p className="text-sm text-gray-600">
-              Signed in as <span className="font-semibold">{user.displayName}</span>
-            </p>
-            <SignOutButton />
-          </div>
-          <div className="flex flex-1 overflow-hidden">
-            <AudioTagger />
-          </div>
+        <div className="flex h-screen overflow-hidden">
+          <AudioTagger displayName={user.displayName} />
         </div>
       )}
     </div>

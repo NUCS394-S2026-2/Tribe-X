@@ -7,6 +7,9 @@ import type {
   ConversationMessage,
   DiscoTags,
 } from '../../shared/types/MusicTags';
+import { AccountMenu } from './AccountMenu';
+import { AudioSidebar } from './AudioSidebar';
+import { UploadPage } from './UploadPage';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const SUPPORTED_TYPES = new Set([
@@ -21,7 +24,7 @@ const SUPPORTED_TYPES = new Set([
 ]);
 const SUPPORTED_EXTENSIONS = new Set(['.mp3', '.wav', '.flac', '.ogg', '.m4a', '.aiff']);
 
-interface FileValidationError {
+export interface FileValidationError {
   type: 'invalid-type' | 'too-large' | 'corrupted';
   message: string;
 }
@@ -305,7 +308,11 @@ function ChatInputBar({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function AudioTagger(): React.ReactElement {
+interface AudioTaggerProps {
+  displayName?: string;
+}
+
+export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactElement {
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
@@ -388,115 +395,46 @@ export function AudioTagger(): React.ReactElement {
   };
 
   return (
-    <div className="flex flex-1 overflow-hidden">
-      {/* Narrow nav sidebar */}
-      <aside className="flex w-16 shrink-0 flex-col items-center gap-4 border-r border-gray-800 bg-gray-900 py-5">
-        {/* Logo mark */}
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-team-blue">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-5 w-5 text-black"
-          >
-            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-          </svg>
-        </div>
+    <div className="flex min-h-0 flex-1 overflow-hidden bg-white">
+      <AudioSidebar />
 
-        {/* Saved tracks placeholder */}
-        <button
-          disabled
-          title="Saved Tracks (coming soon)"
-          className="mt-2 flex flex-col items-center gap-1 opacity-30"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-5 w-5 text-gray-400"
-          >
-            <path d="M5.566 4.657A4.505 4.505 0 0 1 6.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0 0 15.75 3h-7.5a3 3 0 0 0-2.684 1.657ZM2.25 12a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3v-6ZM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 0 1 6.75 6h10.5a3 3 0 0 1 2.683 1.657A4.505 4.505 0 0 0 18.75 7.5H5.25Z" />
-          </svg>
-          <span className="text-xs text-gray-500">Tracks</span>
-        </button>
-      </aside>
-
-      {/* Main */}
-      <div className="flex flex-1 flex-col overflow-hidden bg-gray-50">
-        {!tags ? (
-          /* ── Upload screen ── */
-          <div className="flex flex-1 flex-col items-center justify-center p-8">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-team-blue shadow-lg">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
+        <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 py-5">
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#3817c8] text-white shadow-md shadow-violet-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="h-7 w-7 text-black"
+                className="h-6 w-6"
               >
                 <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
               </svg>
             </div>
-            <h1 className="mt-4 text-2xl font-bold tracking-tight text-gray-900">
-              MetaMusic
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Upload a track and get Disco-ready sync licensing tags in seconds
-            </p>
-
-            <div className="mt-8 w-full max-w-md">
-              <input
-                ref={inputRef}
-                type="file"
-                onChange={handleFileChange}
-                className="sr-only"
-                id="audio-file-input"
-                aria-label="Select audio file"
-              />
-              <label
-                htmlFor="audio-file-input"
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors duration-200 ${
-                  validationError
-                    ? 'border-red-300 bg-red-50 text-red-500 hover:border-red-400'
-                    : 'border-gray-300 bg-white text-gray-500 hover:border-team-blue hover:text-team-blue'
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-10 w-10 opacity-30"
-                >
-                  <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-                </svg>
-                <span className="mt-3 text-sm font-medium">
-                  {file ? file.name : 'Choose an audio file'}
-                </span>
-                <span className="mt-1 text-xs text-gray-400">
-                  MP3, WAV, FLAC, OGG up to 50MB
-                </span>
-              </label>
-
-              {validationError && (
-                <p className="mt-2 text-sm text-red-600" role="alert">
-                  {validationError.message}
-                </p>
-              )}
-
-              <button
-                onClick={handleAnalyze}
-                disabled={!file || loading || !!validationError}
-                className="mt-4 w-full rounded-xl bg-team-blue py-3 text-sm font-semibold text-black shadow-sm transition-all hover:bg-team-blue/90 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-team-blue disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {loading ? 'Analyzing…' : 'Analyze'}
-              </button>
-
-              {error && (
-                <p role="alert" className="mt-3 text-center text-sm text-red-600">
-                  {error}
-                </p>
-              )}
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                MetaMusic
+              </h1>
+              <p className="mt-0.5 text-base font-semibold text-[#3d1de2]">
+                Tag Generator
+              </p>
             </div>
           </div>
+
+          {displayName && <AccountMenu displayName={displayName} />}
+        </header>
+
+        {!tags ? (
+          <UploadPage
+            file={file}
+            inputRef={inputRef}
+            loading={loading}
+            error={error}
+            validationError={validationError}
+            onAnalyze={handleAnalyze}
+            onFileChange={handleFileChange}
+            onReset={resetAll}
+          />
         ) : (
           /* ── Chat screen ── */
           <>

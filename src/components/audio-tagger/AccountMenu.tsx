@@ -10,10 +10,10 @@ export function AccountMenu({ displayName }: AccountMenuProps): ReactElement {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative flex items-center gap-4">
+    <div className="relative flex items-center gap-3">
       <div>
-        <p className="text-sm font-medium text-slate-500">Signed in as</p>
-        <p className="mt-0.5 text-base font-bold text-slate-950">{displayName}</p>
+        <p className="text-base font-medium text-slate-500">Signed in as</p>
+        <p className="mt-0.5 text-lg font-bold text-slate-950">{displayName}</p>
       </div>
       <button
         type="button"
@@ -37,7 +37,7 @@ export function AccountMenu({ displayName }: AccountMenuProps): ReactElement {
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-[calc(100%+0.75rem)] z-20 min-w-36 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-xl shadow-slate-200/70">
+        <div className="absolute right-0 top-[calc(100%+0.75rem)] z-20 min-w-32 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-xl shadow-slate-200/70">
           <SignOutButton />
         </div>
       )}

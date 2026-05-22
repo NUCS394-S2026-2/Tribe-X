@@ -15,7 +15,12 @@ from google import genai
 from google.genai import types as genai_types
 import uvicorn
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+_BACKEND_DIR = os.path.dirname(__file__)
+_ROOT_ENV = os.path.join(_BACKEND_DIR, "..", ".env")
+_BACKEND_ENV = os.path.join(_BACKEND_DIR, ".env")
+
+load_dotenv(dotenv_path=_ROOT_ENV)
+load_dotenv(dotenv_path=_BACKEND_ENV, override=True)
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError, field_validator
@@ -195,7 +200,11 @@ async def analyze(file: UploadFile = File(...)):
         os.unlink(tmp_path)
 
     print("[analyze] calling Gemini...")
-    raw_tags = _call_gemini(audio_context)
+    try:
+        raw_tags = _call_gemini(audio_context)
+    except HTTPException as e:
+        print(f"[analyze] Gemini FAILED: {e.detail}")
+        raise
     print(f"[analyze] Gemini returned: {raw_tags}")
     reasoning = raw_tags.pop("reasoning", "")
     tags = _validate_tags(raw_tags)

@@ -47,7 +47,7 @@ export function UploadPage({
             <h2 className="text-3xl font-bold leading-tight tracking-tight text-slate-950">
               Upload a track.
               <br />
-              Get <span className="text-[#3d1de2]">sync</span> licensing tags.
+              Get <span className="text-[#4f46a5]">sync</span> licensing tags.
             </h2>
             <p className="mt-2 max-w-xl text-base leading-relaxed text-slate-600">
               AI-powered metadata that helps your music get discovered and licensed.
@@ -62,12 +62,12 @@ export function UploadPage({
               {waveBars.map((height, index) => (
                 <span
                   key={`${height}-${index}`}
-                  className="w-1.5 rounded-full bg-gradient-to-t from-[#3d1de2] via-[#a855f7] to-[#bfdbfe]"
+                  className="w-1.5 rounded-full bg-gradient-to-t from-[#4f46a5] via-[#9b8be0] to-[#bfdbfe]"
                   style={{ height }}
                 />
               ))}
             </div>
-            <div className="absolute left-16 top-6 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-[#3d1de2] shadow-xl shadow-slate-200/80">
+            <div className="absolute left-16 top-6 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-[#4f46a5] shadow-xl shadow-slate-200/80">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -93,7 +93,7 @@ export function UploadPage({
           className={`flex min-h-[190px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-5 py-5 text-center transition-colors duration-200 ${
             validationError
               ? 'border-red-300 bg-red-50 text-red-600 hover:border-red-400'
-              : 'border-[#a893ff] bg-white text-slate-950 hover:border-[#3d1de2] hover:bg-violet-50/30'
+              : 'border-[#b8b2e6] bg-white text-slate-950 hover:border-[#4f46a5] hover:bg-violet-50/30'
           }`}
         >
           <svg
@@ -102,7 +102,7 @@ export function UploadPage({
             fill="none"
             stroke="currentColor"
             strokeWidth="1.7"
-            className="h-12 w-12 text-[#3d1de2]"
+            className="h-12 w-12 text-[#4f46a5]"
           >
             <path d="M12 19V9" />
             <path d="m7.5 13.5 4.5-4.5 4.5 4.5" />
@@ -112,7 +112,7 @@ export function UploadPage({
             Drag & drop an audio file here
           </span>
           <span className="mt-2 text-base text-slate-700">or</span>
-          <span className="mt-2 inline-flex rounded-lg bg-gradient-to-r from-[#6d35f2] to-[#3d1de2] px-8 py-2.5 text-base font-bold text-white shadow-lg shadow-violet-200">
+          <span className="mt-2 inline-flex rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] px-8 py-2.5 text-base font-bold text-white shadow-lg shadow-violet-200">
             Choose File
           </span>
           <span className="mt-3 text-base text-slate-500">
@@ -143,7 +143,7 @@ export function UploadPage({
                   />
                 </svg>
               </span>
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#3d1de2] text-white">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6ed1] to-[#4f46a5] text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ export function UploadPage({
               <button
                 type="button"
                 onClick={onReset}
-                className="text-base font-semibold text-[#3d1de2] hover:text-[#27108f]"
+                className="text-base font-semibold text-[#4f46a5] hover:text-[#44378f]"
               >
                 Remove
               </button>
@@ -184,7 +184,7 @@ export function UploadPage({
         <button
           onClick={onAnalyze}
           disabled={!file || loading || !!validationError}
-          className="w-full rounded-lg bg-gradient-to-r from-[#6d35f2] to-[#3d1de2] py-3 text-base font-bold text-white shadow-lg shadow-violet-200 transition-all hover:brightness-105 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#3d1de2] disabled:cursor-not-allowed disabled:opacity-45"
+          className="w-full rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] py-3 text-base font-bold text-white shadow-lg shadow-violet-200 transition-all hover:brightness-105 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#4f46a5] disabled:cursor-not-allowed disabled:opacity-45"
         >
           {loading ? 'Analyzing…' : '✦ Analyze Track'}
         </button>
@@ -203,7 +203,7 @@ export function UploadPage({
 
         <section className="grid overflow-hidden rounded-xl border border-slate-200 bg-white px-6 py-4 shadow-sm md:grid-cols-[1fr_140px]">
           <div>
-            <h3 className="text-base font-bold text-[#3d1de2]">What you get</h3>
+            <h3 className="text-base font-bold text-[#4f46a5]">What you get</h3>
             <ul className="mt-3 flex flex-col gap-2 text-base text-slate-800">
               {[
                 'Detailed sync licensing metadata',
@@ -229,7 +229,7 @@ export function UploadPage({
               <span className="h-1.5 w-20 rounded-full bg-violet-400" />
               <span className="h-1.5 w-20 rounded-full bg-violet-400" />
             </div>
-            <div className="absolute bottom-2 right-7 flex h-10 w-10 items-center justify-center rounded-full bg-[#4d2bd8] text-white shadow-lg">
+            <div className="absolute bottom-2 right-7 flex h-10 w-10 items-center justify-center rounded-full bg-[#5b50b6] text-white shadow-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"

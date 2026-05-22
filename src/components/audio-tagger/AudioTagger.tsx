@@ -157,7 +157,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
         <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#3817c8] text-white shadow-md shadow-violet-200">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6ed1] to-[#4c3b99] text-white shadow-md shadow-violet-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -171,7 +171,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
               <h1 className="text-xl font-bold tracking-tight text-slate-950">
                 MetaMusic
               </h1>
-              <p className="mt-0.5 text-base font-semibold text-[#3d1de2]">
+              <p className="mt-0.5 text-base font-semibold text-[#4f46a5]">
                 Tag Generator
               </p>
             </div>

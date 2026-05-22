@@ -29,6 +29,10 @@ const tagSections = [
   { key: 'soundsLike', label: 'Sounds Like' },
 ] as const;
 
+const tabs = ['Tags', 'Overview', 'Insights', 'Similar Tracks'] as const;
+
+type ResultsTab = (typeof tabs)[number];
+
 const waveformBars = [
   10, 18, 24, 14, 30, 20, 36, 28, 42, 18, 32, 26, 48, 34, 22, 40, 30, 46, 24, 36, 18, 32,
   28, 44, 34, 20, 30, 26, 38, 22, 16, 12,
@@ -154,7 +158,7 @@ function CheckCircleIcon() {
 
 function TagPills({ items }: { items: string[] }) {
   if (!items.length) {
-    return <span className="text-base font-medium text-slate-400">(none)</span>;
+    return <span className="text-sm font-medium text-slate-400">(none)</span>;
   }
 
   return (
@@ -162,7 +166,7 @@ function TagPills({ items }: { items: string[] }) {
       {items.map((item) => (
         <span
           key={item}
-          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-base font-semibold text-slate-900 shadow-sm"
+          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
         >
           {item}
         </span>
@@ -180,7 +184,7 @@ function Confidence({ audioContext }: { audioContext: AudioContext | null }) {
   const confidence = audioContext ? Math.round(audioContext.key_strength * 100) : null;
 
   return (
-    <div className="flex items-center gap-2 text-base font-semibold text-slate-600">
+    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
       <span>Confidence</span>
       <span className="text-emerald-500">
         {confidence === null ? '-' : `${confidence}%`}
@@ -191,12 +195,75 @@ function Confidence({ audioContext }: { audioContext: AudioContext | null }) {
 
 function ReasoningCard({ message }: { message?: string }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="text-lg font-bold text-slate-950">Why these tags?</h3>
-      <p className="mt-3 whitespace-pre-line text-lg leading-relaxed text-slate-600">
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="text-base font-bold text-slate-950">Why these tags?</h3>
+      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">
         {message ||
           'The tags reflect the measured tempo, energy, rhythm, and tonal features detected in the uploaded track.'}
       </p>
+    </section>
+  );
+}
+
+function OverviewPanel({ tags }: { tags: DiscoTags }) {
+  const foundSections = tagSections.filter(
+    (section) => tagsForSection(tags, section.key).length > 0,
+  );
+  const missingSections = tagSections.filter(
+    (section) => tagsForSection(tags, section.key).length === 0,
+  );
+
+  return (
+    <section className="grid gap-4 md:grid-cols-2">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="text-sm font-bold text-slate-950">Tags found</h3>
+        <div className="mt-3 flex flex-col gap-3">
+          {foundSections.map((section) => (
+            <div key={section.key}>
+              <p className="text-xs font-semibold uppercase text-slate-400">
+                {section.label}
+              </p>
+              <div className="mt-1">
+                <TagPills items={tagsForSection(tags, section.key)} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="text-sm font-bold text-slate-950">Tags not found</h3>
+        {missingSections.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {missingSections.map((section) => (
+              <span
+                key={section.key}
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-500"
+              >
+                {section.label}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-slate-500">
+            All tag categories include at least one value.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SimilarTracksPanel({ tags }: { tags: DiscoTags }) {
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="text-sm font-bold text-slate-950">Similar tracks</h3>
+      <p className="mt-1 text-sm text-slate-500">
+        Artist references returned by the analysis.
+      </p>
+      <div className="mt-4">
+        <TagPills items={tags.soundsLike} />
+      </div>
     </section>
   );
 }
@@ -216,9 +283,9 @@ function ChatMessages({
       {visibleMessages.map((message, index) => (
         <div
           key={`${message.role}-${index}-${message.text}`}
-          className={`rounded-xl px-5 py-3 text-base ${
+          className={`rounded-xl px-4 py-2.5 text-sm ${
             message.role === 'user'
-              ? 'ml-auto max-w-[80%] bg-[#ede8ff] text-slate-900'
+              ? 'ml-auto max-w-[80%] bg-[#f1effb] text-slate-900'
               : 'mr-auto max-w-[80%] border border-slate-200 bg-white text-slate-700'
           }`}
         >
@@ -226,7 +293,7 @@ function ChatMessages({
         </div>
       ))}
       {loading && (
-        <div className="mr-auto rounded-xl border border-slate-200 bg-white px-5 py-3 text-base italic text-slate-400">
+        <div className="mr-auto rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm italic text-slate-400">
           Thinking...
         </div>
       )}
@@ -254,29 +321,29 @@ function ChatInputBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
+      className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/60 p-2 shadow-sm"
     >
       <div className="min-w-0 flex-1 px-1">
         <label
           htmlFor="tag-adjustment"
-          className="block text-base font-bold text-slate-800"
+          className="block text-sm font-bold text-slate-700"
         >
-          Something not right?
+          Give feedback on the analysis
         </label>
         <input
           id="tag-adjustment"
           type="text"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder='Tell the AI what to adjust, e.g. "make the mood darker"'
+          placeholder="Tell the AI what to adjust."
           disabled={loading}
-          className="mt-0.5 w-full border-0 bg-transparent text-base text-slate-900 placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
+          className="mt-0.5 w-full border-0 bg-transparent text-sm text-slate-500 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
         />
       </div>
       <button
         type="submit"
         disabled={!input.trim() || loading}
-        className="rounded-lg bg-[#ede8ff] px-4 py-2 text-base font-bold text-[#5b35e6] transition-colors hover:bg-[#ded5ff] disabled:cursor-not-allowed disabled:opacity-45"
+        className="rounded-lg bg-violet-100 px-4 py-2 text-sm font-bold text-violet-500 transition-colors hover:bg-violet-200 hover:text-violet-600 disabled:cursor-not-allowed disabled:bg-violet-50 disabled:text-violet-300 disabled:opacity-100"
       >
         Send
       </button>
@@ -296,6 +363,7 @@ export function ResultsPage({
   onNewTrack,
 }: ResultsPageProps): React.ReactElement {
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<ResultsTab>('Tags');
   const reasoning = chatMessages.find((message) => message.role === 'model')?.text;
 
   const handleCopy = async () => {
@@ -305,13 +373,13 @@ export function ResultsPage({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-4">
-      <div className="mx-auto flex max-w-[900px] flex-col gap-3">
+    <div className="flex-1 overflow-y-auto px-8 py-4">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onNewTrack}
-            className="inline-flex items-center gap-1.5 text-base font-bold text-[#5b35e6] hover:text-[#3512c8]"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#5b50b6] hover:text-[#44378f]"
           >
             <span aria-hidden="true">←</span>
             Back to upload
@@ -323,7 +391,7 @@ export function ResultsPage({
               onClick={() =>
                 downloadText(buildCSV(tags), 'disco-tags.csv', 'text/csv;charset=utf-8;')
               }
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm hover:border-[#5b35e6] hover:text-[#5b35e6]"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm hover:border-[#5b50b6] hover:text-[#5b50b6]"
             >
               <DownloadIcon />
               CSV
@@ -331,7 +399,7 @@ export function ResultsPage({
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6d35f2] to-[#3d1de2] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-violet-200"
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-violet-200"
             >
               <CopyIcon />
               {copied ? 'Copied!' : 'Copy All Tags'}
@@ -339,18 +407,18 @@ export function ResultsPage({
           </div>
         </div>
 
-        <section className="grid gap-4 rounded-xl border border-violet-100 bg-violet-50/30 px-5 py-4 shadow-sm lg:grid-cols-[78px_1fr_auto]">
-          <span className="flex h-[78px] w-[78px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#3d1de2] text-white shadow-lg shadow-violet-200">
-            <MusicNoteIcon className="h-10 w-10" />
+        <section className="grid gap-4 rounded-xl border border-violet-100 bg-violet-50/30 px-4 py-3 shadow-sm lg:grid-cols-[68px_1fr_auto]">
+          <span className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6ed1] to-[#4f46a5] text-white shadow-lg shadow-violet-200">
+            <MusicNoteIcon className="h-9 w-9" />
           </span>
 
           <div className="min-w-0">
             <p className="flex min-w-0 items-center gap-2">
-              <span className="truncate text-lg font-bold text-slate-950">
+              <span className="truncate text-base font-bold text-slate-950">
                 {file?.name ?? 'Uploaded track'}
               </span>
             </p>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-slate-500">
+            <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
               <span>{file ? fileExtension(file.name) : 'AUDIO'}</span>
               {file && (
                 <>
@@ -362,7 +430,7 @@ export function ResultsPage({
               )}
             </p>
 
-            <div className="mt-3 flex items-center gap-3">
+            <div className="mt-2 flex items-center gap-3">
               {audioPreviewUrl ? (
                 // eslint-disable-next-line jsx-a11y/media-has-caption -- Local uploaded audio previews do not have authored caption tracks.
                 <audio
@@ -374,7 +442,7 @@ export function ResultsPage({
               ) : (
                 <>
                   <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7c4dff] to-[#3d1de2] text-white shadow-md shadow-violet-200"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6f63c7] to-[#4f46a5] text-white shadow-md shadow-violet-200"
                     aria-hidden="true"
                   >
                     ▶
@@ -404,53 +472,63 @@ export function ResultsPage({
         </section>
 
         <div className="flex items-center justify-between border-b border-slate-200">
-          <div className="flex items-center gap-2.5">
-            {['Tags', 'Overview', 'Insights', 'Similar Tracks'].map((tab, index) => (
-              <span
+          <div className="flex items-center gap-9">
+            {tabs.map((tab) => (
+              <button
+                type="button"
                 key={tab}
+                onClick={() => setActiveTab(tab)}
                 className={`pb-2.5 text-sm font-semibold ${
-                  index === 0
-                    ? 'border-b-4 border-[#5b35e6] text-slate-950'
-                    : 'text-slate-500'
+                  activeTab === tab
+                    ? 'border-b-4 border-[#5b50b6] text-slate-950'
+                    : 'border-b-4 border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
                 {tab}
-              </span>
+              </button>
             ))}
           </div>
           <Confidence audioContext={audioContext} />
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-          <section className="divide-y divide-slate-200">
-            {tagSections.map((section) => (
-              <div key={section.key} className="py-4">
-                <div>
-                  <h3 className="text-base font-bold text-slate-950">{section.label}</h3>
-                  <div className="mt-2">
-                    <TagPills items={tagsForSection(tags, section.key)} />
+        {activeTab === 'Tags' && (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <section className="divide-y divide-slate-200">
+              {tagSections.map((section) => (
+                <div key={section.key} className="py-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-950">{section.label}</h3>
+                    <div className="mt-2">
+                      <TagPills items={tagsForSection(tags, section.key)} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </section>
+              ))}
+            </section>
 
-          <aside>
-            <ReasoningCard message={reasoning} />
-          </aside>
-        </div>
+            <aside>
+              <ReasoningCard message={reasoning} />
+            </aside>
+          </div>
+        )}
+
+        {activeTab === 'Overview' && <OverviewPanel tags={tags} />}
+
+        {activeTab === 'Insights' && <ReasoningCard message={reasoning} />}
+
+        {activeTab === 'Similar Tracks' && <SimilarTracksPanel tags={tags} />}
 
         <div>
           <ChatInputBar loading={chatLoading} onSend={onChat} />
           <ChatMessages messages={chatMessages} loading={chatLoading} />
           {error && (
-            <p role="alert" className="mt-3 text-base text-red-600">
+            <p role="alert" className="mt-3 text-sm text-red-600">
               {error}
             </p>
           )}
         </div>
 
-        <p className="rounded-lg bg-slate-50 px-5 py-3 text-base font-medium text-slate-500">
+        <p className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500">
           These tags are AI generated. Please review before use.
         </p>
       </div>

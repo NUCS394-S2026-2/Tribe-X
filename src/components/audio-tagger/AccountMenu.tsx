@@ -18,7 +18,7 @@ export function AccountMenu({ displayName }: AccountMenuProps): ReactElement {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="rounded-full p-2 text-slate-950 transition-colors hover:bg-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#3d1de2]"
+        className="rounded-full p-2 text-slate-950 transition-colors hover:bg-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#4f46a5]"
         aria-label="Open account menu"
         aria-expanded={open}
       >

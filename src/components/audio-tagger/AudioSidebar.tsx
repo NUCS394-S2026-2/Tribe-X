@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 export function AudioSidebar(): ReactElement {
   return (
     <aside className="flex w-[88px] shrink-0 flex-col items-center border-r border-[#0f1831] bg-[#071227] px-2 py-5 text-white shadow-[inset_-1px_0_0_rgba(255,255,255,0.04)]">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#3817c8] shadow-lg shadow-violet-950/40">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6ed1] to-[#4c3b99] shadow-lg shadow-violet-950/40">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -14,13 +14,13 @@ export function AudioSidebar(): ReactElement {
         </svg>
       </div>
 
-      <div className="mt-4 h-0.5 w-7 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#3d1de2]" />
+      <div className="mt-4 h-0.5 w-7 rounded-full bg-gradient-to-r from-[#7c6ed1] to-[#4f46a5]" />
 
       <div className="mt-6 flex flex-1 flex-col items-center justify-between">
         <div className="flex flex-col items-center gap-6">
           <button
             type="button"
-            className="flex h-[64px] w-[64px] flex-col items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-[#7c4dff] to-[#3b18c7] text-sm font-semibold text-white shadow-lg shadow-violet-950/30"
+            className="flex h-[64px] w-[64px] flex-col items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-[#6f63c7] to-[#4c3b99] text-sm font-semibold text-white shadow-lg shadow-violet-950/30"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

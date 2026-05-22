@@ -1,15 +1,21 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
-node_modules/*
-coverage
+# Dependencies
+node_modules/
 
-firebase.ts
-.agents
-.firebase
-.claude/skills
+# Build and test output
+dist/
+dist-ssr/
+coverage/
+.vite/
+
+# OS / editor noise
+.DS_Store
+.vscode/
+*.local
+
+# Local agent/tool state
+.agents/
+.firebase/
+.claude/skills/
 
 # Claude Code
 CLAUDE.md
@@ -21,10 +27,25 @@ skills-lock.json
 .env
 .env.*
 !.env.example
+*.pem
+*serviceAccount*.json
+firebase-adminsdk*.json
 
 # Python backend
+venv/
+.venv/
+env/
+.env/
 backend/venv/
-backend/__pycache__/
-backend/**/__pycache__/
+backend/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
 backend/*.xlsx
 backend/outputs/
+audio_to_features_model/outputs/
+audio_to_features_model/*.xlsx

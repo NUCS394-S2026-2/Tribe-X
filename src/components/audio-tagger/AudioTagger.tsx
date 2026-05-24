@@ -203,6 +203,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
             tags={tags}
             onChat={handleChat}
             onNewTrack={resetAll}
+            onTagsChange={setTags}
           />
         )}
       </div>

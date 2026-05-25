@@ -249,13 +249,22 @@ function InteractiveTagPills({
               value={editValue}
               aria-label={`Edit tag ${item}`}
               onChange={(e) => setEditValue(e.target.value)}
-              onBlur={() => commitEdit(index)}
+              onBlur={(e) => {
+                if (e.currentTarget.dataset.editCanceled === 'true') {
+                  delete e.currentTarget.dataset.editCanceled;
+                  return;
+                }
+                commitEdit(index);
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   commitEdit(index);
                 }
                 if (e.key === 'Escape') {
+                  e.preventDefault();
+                  e.currentTarget.dataset.editCanceled = 'true';
+                  setEditValue(item);
                   setEditingIndex(null);
                 }
               }}

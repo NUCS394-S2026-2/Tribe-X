@@ -119,15 +119,16 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
       const result = await analyzeMusicFile(file);
       setTags(result.tags);
       setAudioContext(result.audioContext);
-      setConversationHistory(result.conversationHistory);
+      setConversationHistory(result.conversationHistory ?? []);
       setChatMessages(
-        result.conversationHistory.map((m) => ({
+        (result.conversationHistory ?? []).map((m) => ({
           role: m.role,
           text: m.parts[0]?.text ?? '',
         })),
       );
-    } catch {
-      setError('Analysis failed. Please try again.');
+    } catch (err) {
+      console.error('Analysis error:', err);
+      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
     } finally {
       setLoading(false);
     }

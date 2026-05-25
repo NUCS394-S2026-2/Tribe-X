@@ -15,9 +15,12 @@ interface ResultsPageProps {
   error: string | null;
   file: File | null;
   tags: DiscoTags;
+  suggestedTags: DiscoTags | null;
   onChat: (message: string) => void;
   onNewTrack: () => void;
   onTagsChange: (tags: DiscoTags) => void;
+  onSaveSuggested: () => void;
+  onDismissSuggested: () => void;
 }
 
 const tagSections = [
@@ -580,6 +583,62 @@ function ChatInputBar({
   );
 }
 
+function SuggestedTagsPanel({
+  suggestedTags,
+  onSave,
+  onDismiss,
+}: {
+  suggestedTags: DiscoTags;
+  onSave: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <section
+      aria-label="Suggested tags"
+      className="rounded-xl border border-violet-200 bg-violet-50/40 p-4 shadow-sm"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm font-bold text-slate-950">Suggested tags</h3>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm hover:border-slate-300 hover:text-slate-800"
+          >
+            Dismiss
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            className="rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] px-3 py-1.5 text-sm font-bold text-white shadow-sm shadow-violet-200 hover:brightness-105"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 divide-y divide-violet-100">
+        {tagSections.map((section) => {
+          const items =
+            section.key === 'tempo'
+              ? suggestedTags.tempo
+                ? [suggestedTags.tempo]
+                : []
+              : suggestedTags[section.key];
+          return (
+            <div key={section.key} className="flex items-baseline gap-3 py-2">
+              <span className="w-28 shrink-0 text-xs font-semibold uppercase text-slate-400">
+                {section.label}
+              </span>
+              <TagPills items={items} />
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function ResultsPage({
   audioContext,
   audioPreviewUrl,
@@ -588,9 +647,12 @@ export function ResultsPage({
   error,
   file,
   tags,
+  suggestedTags,
   onChat,
   onNewTrack,
   onTagsChange,
+  onSaveSuggested,
+  onDismissSuggested,
 }: ResultsPageProps): React.ReactElement {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<ResultsTab>('Tags');
@@ -770,6 +832,14 @@ export function ResultsPage({
             </p>
           )}
         </div>
+
+        {suggestedTags && (
+          <SuggestedTagsPanel
+            suggestedTags={suggestedTags}
+            onSave={onSaveSuggested}
+            onDismiss={onDismissSuggested}
+          />
+        )}
 
         <p className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500">
           These tags are AI generated. Please review before use.

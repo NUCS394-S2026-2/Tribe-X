@@ -113,7 +113,7 @@ describe('AudioTagger', () => {
     await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/analysis failed/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/network error/i);
     });
   });
 

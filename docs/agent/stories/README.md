@@ -8,7 +8,8 @@ Use `docs/agent/stories/_template.md` for new stories.
 
 ## Index
 
-| Slug                                                          | Title                   | State   | GitHub issue    |
-| ------------------------------------------------------------- | ----------------------- | ------- | --------------- |
-| _STORY_SLUG_                                                  | _Your first story here_ | _Draft_ | _#ISSUE_NUMBER_ |
-| [0004-user-tag-interactivity](0004-user-tag-interactivity.md) | User Tag Interactivity  | Ready   | #22             |
+| Slug                                                                | Title                     | State   | GitHub issue    |
+| ------------------------------------------------------------------- | ------------------------- | ------- | --------------- |
+| _STORY_SLUG_                                                        | _Your first story here_   | _Draft_ | _#ISSUE_NUMBER_ |
+| [0004-user-tag-interactivity](0004-user-tag-interactivity.md)       | User Tag Interactivity    | Ready   | #22             |
+| [0005-suggested-tags-comparison](0005-suggested-tags-comparison.md) | Suggested Tags Comparison | Ready   | #48             |

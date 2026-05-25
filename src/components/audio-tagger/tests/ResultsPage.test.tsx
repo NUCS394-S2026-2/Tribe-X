@@ -41,6 +41,17 @@ const initialModelMessage: ChatMessage = {
   text: 'The high harmonic ratio and low onset density suggest an ambient, melodic track.',
 };
 
+const mockSuggestedTags: DiscoTags = {
+  genre: ['Jazz', 'Blues'],
+  instruments: ['Guitar', 'Bass'],
+  lyricThemes: ['Love'],
+  mood: ['Melancholic'],
+  tempo: 'Slow',
+  type: [],
+  vocals: ['Female'],
+  soundsLike: ['Norah Jones'],
+};
+
 const baseProps = {
   audioContext: mockAudioContext,
   audioPreviewUrl: null,
@@ -49,9 +60,12 @@ const baseProps = {
   error: null,
   file: new File(['audio'], 'session.wav', { type: 'audio/wav' }),
   tags: mockTags,
+  suggestedTags: null,
   onChat: vi.fn(),
   onNewTrack: vi.fn(),
   onTagsChange: vi.fn(),
+  onSaveSuggested: vi.fn(),
+  onDismissSuggested: vi.fn(),
 };
 
 describe('ResultsPage', () => {
@@ -399,5 +413,58 @@ describe('ResultsPage — tag interactivity', () => {
     const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
     // Re-render with the returned tags to confirm (none) would appear
     expect(updated.soundsLike).toHaveLength(0);
+  });
+});
+
+// ─── AC: Suggested tags panel ─────────────────────────────────────────────────
+
+describe('ResultsPage — suggested tags panel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // AC-2: Panel appears with suggested values
+  it('renders the suggested tags panel when suggestedTags is provided', () => {
+    render(<ResultsPage {...baseProps} suggestedTags={mockSuggestedTags} />);
+    expect(screen.getByRole('region', { name: /suggested tags/i })).toBeInTheDocument();
+  });
+
+  it('shows suggested tag values inside the panel', () => {
+    render(<ResultsPage {...baseProps} suggestedTags={mockSuggestedTags} />);
+    expect(screen.getByRole('region', { name: /suggested tags/i })).toHaveTextContent(
+      'Jazz',
+    );
+    expect(screen.getByRole('region', { name: /suggested tags/i })).toHaveTextContent(
+      'Norah Jones',
+    );
+  });
+
+  // AC-2 (absent): Panel is not rendered when suggestedTags is null
+  it('does not render the suggested tags panel when suggestedTags is null', () => {
+    render(<ResultsPage {...baseProps} suggestedTags={null} />);
+    expect(
+      screen.queryByRole('region', { name: /suggested tags/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  // AC-1: Current tags are unchanged while suggestion is shown
+  it('still shows the current tags in the Tags tab alongside the suggestion panel', () => {
+    render(<ResultsPage {...baseProps} suggestedTags={mockSuggestedTags} />);
+    expect(screen.getByText('Electronic')).toBeInTheDocument();
+    expect(screen.getByText('Ambient')).toBeInTheDocument();
+  });
+
+  // AC-3: Save
+  it('calls onSaveSuggested when the Save button is clicked', async () => {
+    render(<ResultsPage {...baseProps} suggestedTags={mockSuggestedTags} />);
+    await userEvent.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(baseProps.onSaveSuggested).toHaveBeenCalledOnce();
+  });
+
+  // AC-4: Dismiss
+  it('calls onDismissSuggested when the Dismiss button is clicked', async () => {
+    render(<ResultsPage {...baseProps} suggestedTags={mockSuggestedTags} />);
+    await userEvent.click(screen.getByRole('button', { name: /dismiss/i }));
+    expect(baseProps.onDismissSuggested).toHaveBeenCalledOnce();
   });
 });

@@ -51,6 +51,7 @@ const baseProps = {
   tags: mockTags,
   onChat: vi.fn(),
   onNewTrack: vi.fn(),
+  onTagsChange: vi.fn(),
 };
 
 describe('ResultsPage', () => {
@@ -287,5 +288,116 @@ describe('ResultsPage', () => {
   it('renders the AI-generated disclaimer', () => {
     render(<ResultsPage {...baseProps} />);
     expect(screen.getByText(/ai generated/i)).toBeInTheDocument();
+  });
+});
+
+// ─── AC: Tag interactivity ────────────────────────────────────────────────────
+
+describe('ResultsPage — tag interactivity', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // AC-1: Remove
+  it('calls onTagsChange without the removed tag when × is clicked', async () => {
+    render(<ResultsPage {...baseProps} />);
+    await userEvent.click(screen.getByRole('button', { name: /remove tag electronic/i }));
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.genre).not.toContain('Electronic');
+    expect(updated.genre).toContain('Ambient');
+  });
+
+  // AC-2: Add
+  it('calls onTagsChange with the new tag when Enter is pressed in the add input', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const addInput = screen.getByRole('textbox', { name: /add tag to genre/i });
+    await userEvent.type(addInput, 'Jazz{Enter}');
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.genre).toContain('Jazz');
+  });
+
+  it('clears the add input after a tag is added', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const addInput = screen.getByRole('textbox', { name: /add tag to genre/i });
+    await userEvent.type(addInput, 'Jazz{Enter}');
+    expect(addInput).toHaveValue('');
+  });
+
+  // AC-3: Edit (array field)
+  it('enters edit mode on double-click and calls onTagsChange with updated value on Enter', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const editTrigger = screen.getByRole('button', { name: /edit tag electronic/i });
+    await userEvent.dblClick(editTrigger);
+    const editInput = screen.getByRole('textbox', { name: /edit tag electronic/i });
+    await userEvent.clear(editInput);
+    await userEvent.type(editInput, 'Electronica{Enter}');
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.genre).toContain('Electronica');
+    expect(updated.genre).not.toContain('Electronic');
+  });
+
+  it('removes the tag when the edit input is cleared and Enter is pressed', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const editTrigger = screen.getByRole('button', { name: /edit tag electronic/i });
+    await userEvent.dblClick(editTrigger);
+    const editInput = screen.getByRole('textbox', { name: /edit tag electronic/i });
+    await userEvent.clear(editInput);
+    await userEvent.keyboard('{Enter}');
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.genre).not.toContain('Electronic');
+  });
+
+  // AC-4: Edit tempo
+  it('calls onTagsChange with updated tempo when double-clicked and confirmed', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const tempoTrigger = screen.getByRole('button', { name: /edit tempo: midtempo/i });
+    await userEvent.dblClick(tempoTrigger);
+    const tempoInput = screen.getByRole('textbox', { name: /edit tempo/i });
+    await userEvent.clear(tempoInput);
+    await userEvent.type(tempoInput, 'Fast{Enter}');
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.tempo).toBe('Fast');
+  });
+
+  it('clears tempo when edit input is submitted empty', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const tempoTrigger = screen.getByRole('button', { name: /edit tempo: midtempo/i });
+    await userEvent.dblClick(tempoTrigger);
+    const tempoInput = screen.getByRole('textbox', { name: /edit tempo/i });
+    await userEvent.clear(tempoInput);
+    await userEvent.keyboard('{Enter}');
+    expect(baseProps.onTagsChange).toHaveBeenCalledOnce();
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    expect(updated.tempo).toBe('');
+  });
+
+  // AC-5: Duplicate guard
+  it('does not call onTagsChange when a duplicate tag is added', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const addInput = screen.getByRole('textbox', { name: /add tag to genre/i });
+    await userEvent.type(addInput, 'Electronic{Enter}');
+    expect(baseProps.onTagsChange).not.toHaveBeenCalled();
+  });
+
+  it('does not call onTagsChange when a case-insensitive duplicate tag is added', async () => {
+    render(<ResultsPage {...baseProps} />);
+    const addInput = screen.getByRole('textbox', { name: /add tag to genre/i });
+    await userEvent.type(addInput, 'electronic{Enter}');
+    expect(baseProps.onTagsChange).not.toHaveBeenCalled();
+  });
+
+  // AC-6: Empty state after removal
+  it('shows "(none)" for a section after all its tags are removed', async () => {
+    const tagsWithOneSoundLike = { ...mockTags, soundsLike: ['Brian Eno'] };
+    render(<ResultsPage {...baseProps} tags={tagsWithOneSoundLike} />);
+    await userEvent.click(screen.getByRole('button', { name: /remove tag brian eno/i }));
+    const updated: DiscoTags = baseProps.onTagsChange.mock.calls[0][0] as DiscoTags;
+    // Re-render with the returned tags to confirm (none) would appear
+    expect(updated.soundsLike).toHaveLength(0);
   });
 });

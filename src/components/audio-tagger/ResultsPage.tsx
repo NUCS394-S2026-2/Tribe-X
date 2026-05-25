@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 
 import type { AudioContext, DiscoTags } from '../../shared/types/MusicTags';
 
@@ -17,6 +17,7 @@ interface ResultsPageProps {
   tags: DiscoTags;
   onChat: (message: string) => void;
   onNewTrack: () => void;
+  onTagsChange: (tags: DiscoTags) => void;
 }
 
 const tagSections = [
@@ -172,6 +173,246 @@ function TagPills({ items }: { items: string[] }) {
         </span>
       ))}
     </div>
+  );
+}
+
+type ArrayTagKey = Exclude<keyof DiscoTags, 'tempo'>;
+
+function InteractiveTagPills({
+  sectionKey,
+  items,
+  tags,
+  onTagsChange,
+}: {
+  sectionKey: ArrayTagKey;
+  items: string[];
+  tags: DiscoTags;
+  onTagsChange: (tags: DiscoTags) => void;
+}) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [addValue, setAddValue] = useState('');
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  const isDuplicate = (value: string, excludeIndex?: number) =>
+    items.some(
+      (item, i) =>
+        item.trim().toLowerCase() === value.trim().toLowerCase() && i !== excludeIndex,
+    );
+
+  const commitEdit = (index: number) => {
+    const trimmed = editValue.trim();
+    setEditingIndex(null);
+    if (trimmed === '' || trimmed.toLowerCase() === items[index].toLowerCase()) {
+      if (trimmed === '') {
+        onTagsChange({ ...tags, [sectionKey]: items.filter((_, i) => i !== index) });
+      }
+      return;
+    }
+    if (isDuplicate(trimmed, index)) return;
+    const updated = items.map((item, i) => (i === index ? trimmed : item));
+    onTagsChange({ ...tags, [sectionKey]: updated });
+  };
+
+  const startEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditValue(items[index]);
+    setTimeout(() => editInputRef.current?.select(), 0);
+  };
+
+  const handleRemove = (index: number) => {
+    onTagsChange({ ...tags, [sectionKey]: items.filter((_, i) => i !== index) });
+  };
+
+  const handleAdd = () => {
+    const trimmed = addValue.trim();
+    if (!trimmed || isDuplicate(trimmed)) {
+      setAddValue('');
+      return;
+    }
+    onTagsChange({ ...tags, [sectionKey]: [...items, trimmed] });
+    setAddValue('');
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
+        {items.length === 0 && editingIndex === null && (
+          <span className="text-sm font-medium text-slate-400">(none)</span>
+        )}
+        {items.map((item, index) =>
+          editingIndex === index ? (
+            <input
+              key={`edit-${index}`}
+              ref={editInputRef}
+              type="text"
+              value={editValue}
+              aria-label={`Edit tag ${item}`}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={(e) => {
+                if (e.currentTarget.dataset.editCanceled === 'true') {
+                  delete e.currentTarget.dataset.editCanceled;
+                  return;
+                }
+                commitEdit(index);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitEdit(index);
+                }
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  e.currentTarget.dataset.editCanceled = 'true';
+                  setEditValue(item);
+                  setEditingIndex(null);
+                }
+              }}
+              className="rounded-full border border-violet-400 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none ring-1 ring-violet-400"
+            />
+          ) : (
+            <span
+              key={item}
+              className="group inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
+            >
+              <span
+                role="button"
+                tabIndex={0}
+                aria-label={`Edit tag ${item}`}
+                className="cursor-text"
+                onDoubleClick={() => startEdit(index)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    startEdit(index);
+                  }
+                }}
+              >
+                {item}
+              </span>
+              <button
+                type="button"
+                aria-label={`Remove tag ${item}`}
+                onClick={() => handleRemove(index)}
+                className="ml-0.5 rounded-full text-slate-400 opacity-0 transition-opacity hover:text-slate-700 group-hover:opacity-100 focus:opacity-100"
+              >
+                ×
+              </button>
+            </span>
+          ),
+        )}
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleAdd();
+        }}
+        className="flex items-center gap-1.5"
+      >
+        <input
+          type="text"
+          value={addValue}
+          aria-label={`Add tag to ${sectionKey}`}
+          placeholder="Add tag…"
+          onChange={(e) => setAddValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              handleAdd();
+            }
+          }}
+          className="w-28 rounded-full border border-dashed border-slate-300 bg-transparent px-3 py-0.5 text-sm text-slate-600 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400"
+        />
+        <button
+          type="submit"
+          disabled={!addValue.trim()}
+          className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-sm font-semibold text-slate-600 shadow-sm hover:border-violet-400 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          +
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function EditableSingleValue({
+  value,
+  tags,
+  onTagsChange,
+}: {
+  value: string;
+  tags: DiscoTags;
+  onTagsChange: (tags: DiscoTags) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const startEdit = () => {
+    setEditing(true);
+    setEditValue(value);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+
+  const commit = () => {
+    setEditing(false);
+    onTagsChange({ ...tags, tempo: editValue.trim() });
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        type="text"
+        value={editValue}
+        aria-label="Edit tempo"
+        onChange={(e) => setEditValue(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commit();
+          }
+          if (e.key === 'Escape') {
+            setEditing(false);
+          }
+        }}
+        className="rounded-full border border-violet-400 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none ring-1 ring-violet-400"
+      />
+    );
+  }
+
+  if (!value) {
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        aria-label="Edit tempo"
+        className="cursor-text text-sm font-medium text-slate-400"
+        onDoubleClick={startEdit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') startEdit();
+        }}
+      >
+        (none)
+      </span>
+    );
+  }
+
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-label={`Edit tempo: ${value}`}
+      className="cursor-text rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
+      onDoubleClick={startEdit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') startEdit();
+      }}
+    >
+      {value}
+    </span>
   );
 }
 
@@ -361,6 +602,7 @@ export function ResultsPage({
   tags,
   onChat,
   onNewTrack,
+  onTagsChange,
 }: ResultsPageProps): React.ReactElement {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<ResultsTab>('Tags');
@@ -499,7 +741,20 @@ export function ResultsPage({
                   <div>
                     <h3 className="text-sm font-bold text-slate-950">{section.label}</h3>
                     <div className="mt-2">
-                      <TagPills items={tagsForSection(tags, section.key)} />
+                      {section.key === 'tempo' ? (
+                        <EditableSingleValue
+                          value={tags.tempo}
+                          tags={tags}
+                          onTagsChange={onTagsChange}
+                        />
+                      ) : (
+                        <InteractiveTagPills
+                          sectionKey={section.key}
+                          items={tags[section.key]}
+                          tags={tags}
+                          onTagsChange={onTagsChange}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

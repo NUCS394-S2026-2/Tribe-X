@@ -59,6 +59,7 @@ interface AudioTaggerProps {
 export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactElement {
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
+  const [suggestedTags, setSuggestedTags] = useState<DiscoTags | null>(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>(
@@ -90,6 +91,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
   const resetAll = () => {
     setFile(null);
     setTags(null);
+    setSuggestedTags(null);
     setAudioContext(null);
     setConversationHistory([]);
     setChatMessages([]);
@@ -141,7 +143,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
     setError(null);
     try {
       const result = await chatWithGemini(message, conversationHistory, audioContext);
-      setTags(result.updatedTags);
+      setSuggestedTags(result.updatedTags);
       setConversationHistory(result.conversationHistory);
       setChatMessages((prev) => [...prev, { role: 'model', text: result.message }]);
     } catch {
@@ -202,9 +204,15 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
             file={file}
             audioPreviewUrl={audioPreviewUrl}
             tags={tags}
+            suggestedTags={suggestedTags}
             onChat={handleChat}
             onNewTrack={resetAll}
             onTagsChange={setTags}
+            onSaveSuggested={() => {
+              if (suggestedTags) setTags(suggestedTags);
+              setSuggestedTags(null);
+            }}
+            onDismissSuggested={() => setSuggestedTags(null)}
           />
         )}
       </div>

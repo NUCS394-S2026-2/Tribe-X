@@ -309,8 +309,11 @@ function InteractiveTagPills({
           onChange={(e) => setAddValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Tab') {
-              e.preventDefault();
-              handleAdd();
+              const nextValue = addValue.trim();
+              if (nextValue && !items.includes(nextValue)) {
+                e.preventDefault();
+                handleAdd();
+              }
             }
           }}
           className="w-28 rounded-full border border-dashed border-slate-300 bg-transparent px-3 py-0.5 text-sm text-slate-600 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400"

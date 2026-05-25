@@ -282,7 +282,10 @@ function InteractiveTagPills({
                 className="cursor-text"
                 onDoubleClick={() => startEdit(index)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') startEdit(index);
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    startEdit(index);
+                  }
                 }}
               >
                 {item}

@@ -16,6 +16,8 @@ interface ResultsPageProps {
   file: File | null;
   tags: DiscoTags;
   suggestedTags: DiscoTags | null;
+  saveError?: string | null;
+  loadedFileName?: string | null;
   onChat: (message: string) => void;
   onNewTrack: () => void;
   onTagsChange: (tags: DiscoTags) => void;
@@ -663,6 +665,8 @@ export function ResultsPage({
   file,
   tags,
   suggestedTags,
+  saveError,
+  loadedFileName,
   onChat,
   onNewTrack,
   onTagsChange,
@@ -672,6 +676,7 @@ export function ResultsPage({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<ResultsTab>('Tags');
   const reasoning = chatMessages.find((message) => message.role === 'model')?.text;
+  const displayFileName = file?.name ?? loadedFileName ?? 'Uploaded track';
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(buildPlainText(tags));
@@ -722,11 +727,13 @@ export function ResultsPage({
           <div className="min-w-0">
             <p className="flex min-w-0 items-center gap-2">
               <span className="truncate text-base font-bold text-slate-950">
-                {file?.name ?? 'Uploaded track'}
+                {displayFileName}
               </span>
             </p>
             <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
-              <span>{file ? fileExtension(file.name) : 'AUDIO'}</span>
+              <span>
+                {file ? fileExtension(file.name) : fileExtension(displayFileName)}
+              </span>
               {file && (
                 <>
                   <span aria-hidden="true">•</span>
@@ -744,7 +751,7 @@ export function ResultsPage({
                   controls
                   src={audioPreviewUrl}
                   className="min-w-0 flex-1"
-                  aria-label={`Preview ${file?.name ?? 'uploaded track'}`}
+                  aria-label={`Preview ${displayFileName}`}
                 />
               ) : (
                 <>
@@ -854,6 +861,12 @@ export function ResultsPage({
             onSave={onSaveSuggested}
             onDismiss={onDismissSuggested}
           />
+        )}
+
+        {saveError && (
+          <p className="rounded-lg bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700">
+            {saveError}
+          </p>
         )}
 
         <p className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500">

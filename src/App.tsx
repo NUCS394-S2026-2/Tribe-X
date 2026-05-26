@@ -25,7 +25,7 @@ function AppContent(): React.ReactElement {
         </div>
       ) : (
         <div className="flex h-screen overflow-hidden">
-          <AudioTagger displayName={user.displayName} />
+          <AudioTagger displayName={user.displayName} uid={user.uid} />
         </div>
       )}
     </div>

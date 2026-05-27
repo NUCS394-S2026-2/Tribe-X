@@ -40,7 +40,7 @@ except ImportError:
 # Essentia feature extraction
 # ---------------------------------------------------------------------------
 
-ANALYSIS_DURATION = 30  # seconds — analyse first 30s for speed
+ANALYSIS_DURATION = 15  # seconds — analyse first 15s for speed
 
 
 def extract_essentia_features(audio_path: str) -> dict:

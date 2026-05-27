@@ -22,7 +22,13 @@ const GEMINI_KEY_STORAGE = 'geminiApiKey';
 function mapApiError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
   try {
-    const parsed = JSON.parse(raw) as { code?: string };
+    // FastAPI wraps errors as {"detail": "..."} — unwrap before parsing our code
+    const envelope = JSON.parse(raw) as { detail?: string; code?: string };
+    const inner = envelope.detail ?? raw;
+    const parsed = (typeof inner === 'string' ? JSON.parse(inner) : inner) as {
+      code?: string;
+      message?: string;
+    };
     switch (parsed.code) {
       case 'NO_KEY':
         return 'Please enter your Gemini API key.';
@@ -31,7 +37,7 @@ function mapApiError(err: unknown): string {
       case 'RATE_LIMITED':
         return 'Rate limit reached — please wait a moment and try again.';
       default:
-        return raw;
+        return parsed.message ?? inner;
     }
   } catch {
     return raw;

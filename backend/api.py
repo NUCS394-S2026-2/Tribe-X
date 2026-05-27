@@ -165,7 +165,7 @@ def _call_gemini(audio_context: dict, api_key: str) -> dict:
     )
     try:
         response = _gemini_client(api_key).models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-1.5-flash",
             contents=prompt,
         )
         return _extract_json(response.text)
@@ -251,7 +251,7 @@ async def chat(req: ChatRequest, x_gemini_api_key: str | None = Header(default=N
 
     try:
         chat_session = _gemini_client(x_gemini_api_key).chats.create(
-            model="gemini-2.5-flash",
+            model="gemini-1.5-flash",
             history=history,
             config=genai_types.GenerateContentConfig(
                 system_instruction=system_instruction,

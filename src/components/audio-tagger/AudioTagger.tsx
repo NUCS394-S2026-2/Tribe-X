@@ -11,10 +11,38 @@ import type {
 } from '../../shared/types/MusicTags';
 import { AccountMenu } from './AccountMenu';
 import { AudioSidebar } from './AudioSidebar';
+import { GeminiKeyPrompt } from './GeminiKeyPrompt';
 import { HistoryPage } from './HistoryPage';
 import { HistoryPanel } from './HistoryPanel';
 import { type ChatMessage, ResultsPage } from './ResultsPage';
 import { UploadPage } from './UploadPage';
+
+const GEMINI_KEY_STORAGE = 'geminiApiKey';
+
+function mapApiError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  try {
+    // FastAPI wraps errors as {"detail": "..."} — unwrap before parsing our code
+    const envelope = JSON.parse(raw) as { detail?: string; code?: string };
+    const inner = envelope.detail ?? raw;
+    const parsed = (typeof inner === 'string' ? JSON.parse(inner) : inner) as {
+      code?: string;
+      message?: string;
+    };
+    switch (parsed.code) {
+      case 'NO_KEY':
+        return 'Please enter your Gemini API key.';
+      case 'INVALID_KEY':
+        return 'Invalid Gemini API key — please check and try again.';
+      case 'RATE_LIMITED':
+        return 'Rate limit reached — please wait a moment and try again.';
+      default:
+        return parsed.message ?? inner;
+    }
+  } catch {
+    return raw;
+  }
+}
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const SUPPORTED_TYPES = new Set([
@@ -64,6 +92,9 @@ interface AudioTaggerProps {
 }
 
 export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.ReactElement {
+  const [geminiKey, setGeminiKey] = useState<string>(
+    () => localStorage.getItem(GEMINI_KEY_STORAGE) ?? '',
+  );
   const [view, setView] = useState<View>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
@@ -137,13 +168,18 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
     }
   };
 
+  const handleSaveKey = (key: string) => {
+    localStorage.setItem(GEMINI_KEY_STORAGE, key);
+    setGeminiKey(key);
+  };
+
   const handleAnalyze = async () => {
     if (!file) return;
     setLoading(true);
     setError(null);
     setSaveError(null);
     try {
-      const result = await analyzeMusicFile(file);
+      const result = await analyzeMusicFile(file, geminiKey);
       setTags(result.tags);
       setAudioContext(result.audioContext);
       setConversationHistory(result.conversationHistory ?? []);
@@ -165,7 +201,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
       }
     } catch (err) {
       console.error('Analysis error:', err);
-      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
+      setError(mapApiError(err));
     } finally {
       setLoading(false);
     }
@@ -177,12 +213,17 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
     setChatLoading(true);
     setError(null);
     try {
-      const result = await chatWithGemini(message, conversationHistory, audioContext);
+      const result = await chatWithGemini(
+        message,
+        conversationHistory,
+        audioContext,
+        geminiKey,
+      );
       setSuggestedTags(result.updatedTags);
       setConversationHistory(result.conversationHistory);
       setChatMessages((prev) => [...prev, { role: 'model', text: result.message }]);
-    } catch {
-      setError('Chat failed. Please try again.');
+    } catch (err) {
+      setError(mapApiError(err));
     } finally {
       setChatLoading(false);
     }
@@ -234,10 +275,22 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
             </div>
           </div>
 
-          {displayName && <AccountMenu displayName={displayName} />}
+          <div className="flex items-center gap-3">
+            {geminiKey && (
+              <button
+                onClick={() => handleSaveKey('')}
+                className="text-xs text-slate-400 underline underline-offset-2 hover:text-slate-600"
+              >
+                Change API key
+              </button>
+            )}
+            {displayName && <AccountMenu displayName={displayName} />}
+          </div>
         </header>
 
-        {view === 'history' && uid ? (
+        {!geminiKey ? (
+          <GeminiKeyPrompt onSave={handleSaveKey} />
+        ) : view === 'history' && uid ? (
           <HistoryPage uid={uid} onSelect={handleSelectHistory} />
         ) : view === 'results' && tags ? (
           <ResultsPage

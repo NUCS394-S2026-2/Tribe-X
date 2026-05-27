@@ -51,8 +51,8 @@ def extract_essentia_features(audio_path: str) -> dict:
     audio = audio_full[:max_samples] if len(audio_full) > max_samples else audio_full
 
     # --- Rhythm ---
-    rhythm = es.RhythmExtractor2013(method="degara")
-    bpm, beats, beats_confidence, _, beats_intervals = rhythm(audio)
+    tempo, _ = librosa.beat.beat_track(y=audio, sr=22050)
+    bpm = float(np.atleast_1d(tempo)[0])
 
     # --- Key & mode ---
     key, scale, key_strength = es.KeyExtractor()(audio)
@@ -430,6 +430,15 @@ class MetaMusicTagger:
     Extract sync licensing metadata using Essentia + librosa.
     No LLM calls — fully local.
     """
+
+    def warmup(self):
+        """Run a silent dummy pass through Essentia so the first real request doesn't pay init cost."""
+        silence = np.zeros(22050, dtype=np.float32)
+        try:
+            es.KeyExtractor()(silence)
+            print("[warmup] Essentia algorithms initialized.")
+        except Exception:
+            pass
 
     def tag_file(self, audio_path: str) -> dict:
         """Run Essentia and return a human-readable audio_context dict for Gemini."""

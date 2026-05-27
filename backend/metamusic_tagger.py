@@ -79,15 +79,16 @@ def extract_essentia_features(audio_path: str) -> dict:
 
     # --- Harmonic / percussive ratio via librosa HPSS ---
     audio_lr = audio.astype(np.float32)
-    y_harm, y_perc = librosa.effects.hpss(audio_lr)
+    audio_hpss = audio_lr[:10 * 22050]
+    y_harm, y_perc = librosa.effects.hpss(audio_hpss)
     harm_rms = float(np.mean(librosa.feature.rms(y=y_harm)))
     perc_rms = float(np.mean(librosa.feature.rms(y=y_perc)))
     harmonic_ratio = harm_rms / (harm_rms + perc_rms + 1e-8)
 
     # --- Onset density ---
-    onset_frames  = librosa.onset.onset_detect(y=audio_lr, sr=22050)
+    onset_frames  = librosa.onset.onset_detect(y=audio_hpss, sr=22050)
     duration      = len(audio) / 22050
-    onset_density = len(onset_frames) / duration if duration > 0 else 0.0
+    onset_density = len(onset_frames) / (len(audio_hpss) / 22050) if duration > 0 else 0.0
 
     # --- Tempo feel label ---
     tempo = float(bpm)

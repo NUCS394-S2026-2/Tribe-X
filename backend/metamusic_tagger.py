@@ -40,7 +40,7 @@ except ImportError:
 # Essentia feature extraction
 # ---------------------------------------------------------------------------
 
-ANALYSIS_DURATION = 30  # seconds — analyse first 30s for speed
+ANALYSIS_DURATION = 15  # seconds — analyse first 15s for speed
 
 
 def extract_essentia_features(audio_path: str) -> dict:
@@ -51,8 +51,8 @@ def extract_essentia_features(audio_path: str) -> dict:
     audio = audio_full[:max_samples] if len(audio_full) > max_samples else audio_full
 
     # --- Rhythm ---
-    rhythm = es.RhythmExtractor2013(method="degara")
-    bpm, beats, beats_confidence, _, beats_intervals = rhythm(audio)
+    tempo, _ = librosa.beat.beat_track(y=audio, sr=22050)
+    bpm = float(np.atleast_1d(tempo)[0])
 
     # --- Key & mode ---
     key, scale, key_strength = es.KeyExtractor()(audio)
@@ -79,15 +79,16 @@ def extract_essentia_features(audio_path: str) -> dict:
 
     # --- Harmonic / percussive ratio via librosa HPSS ---
     audio_lr = audio.astype(np.float32)
-    y_harm, y_perc = librosa.effects.hpss(audio_lr)
+    audio_hpss = audio_lr[:10 * 22050]
+    y_harm, y_perc = librosa.effects.hpss(audio_hpss)
     harm_rms = float(np.mean(librosa.feature.rms(y=y_harm)))
     perc_rms = float(np.mean(librosa.feature.rms(y=y_perc)))
     harmonic_ratio = harm_rms / (harm_rms + perc_rms + 1e-8)
 
     # --- Onset density ---
-    onset_frames  = librosa.onset.onset_detect(y=audio_lr, sr=22050)
+    onset_frames  = librosa.onset.onset_detect(y=audio_hpss, sr=22050)
     duration      = len(audio) / 22050
-    onset_density = len(onset_frames) / duration if duration > 0 else 0.0
+    onset_density = len(onset_frames) / (len(audio_hpss) / 22050) if duration > 0 else 0.0
 
     # --- Tempo feel label ---
     tempo = float(bpm)
@@ -430,6 +431,15 @@ class MetaMusicTagger:
     Extract sync licensing metadata using Essentia + librosa.
     No LLM calls — fully local.
     """
+
+    def warmup(self):
+        """Run a silent dummy pass through Essentia so the first real request doesn't pay init cost."""
+        silence = np.zeros(22050, dtype=np.float32)
+        try:
+            es.KeyExtractor()(silence)
+            print("[warmup] Essentia algorithms initialized.")
+        except Exception:
+            pass
 
     def tag_file(self, audio_path: str) -> dict:
         """Run Essentia and return a human-readable audio_context dict for Gemini."""

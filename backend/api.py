@@ -29,6 +29,11 @@ from metamusic_tagger import MetaMusicTagger
 
 app = FastAPI(title="MetaMusic Analysis API")
 
+
+@app.on_event("startup")
+async def _warmup_essentia():
+    _tagger.warmup()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

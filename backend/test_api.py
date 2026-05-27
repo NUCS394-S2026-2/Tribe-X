@@ -49,6 +49,37 @@ def _make_mock_client(response_text: str) -> MagicMock:
     return mock_client
 
 
+def test_warmup_then_key_extractor_works():
+    """After warmup(), KeyExtractor should return valid types — confirms Essentia is functional."""
+    import numpy as np
+    import essentia.standard as es
+    from metamusic_tagger import MetaMusicTagger
+
+    MetaMusicTagger().warmup()
+
+    sine = np.sin(2 * np.pi * 440 * np.linspace(0, 1, 22050, dtype=np.float32))
+    key, scale, key_strength = es.KeyExtractor()(sine)
+
+    assert isinstance(key, str) and len(key) > 0
+    assert scale in ("major", "minor")
+    assert 0.0 <= float(key_strength) <= 1.0
+
+
+def test_extract_essentia_features_tempo_is_python_float(tmp_path):
+    """tempo must be a plain Python float after the librosa beat_track swap (not a numpy scalar)."""
+    import soundfile as sf
+    import numpy as np
+    from metamusic_tagger import extract_essentia_features
+
+    audio_path = str(tmp_path / "sine.wav")
+    sf.write(audio_path, np.sin(2 * np.pi * 440 * np.linspace(0, 3, 22050 * 3, dtype=np.float32)), 22050)
+
+    features = extract_essentia_features(audio_path)
+
+    assert type(features["tempo"]) is float
+    assert features["tempo"] >= 0.0
+
+
 def test_call_gemini_happy_path():
     """_call_gemini parses valid JSON returned by Gemini and returns a dict."""
     import api

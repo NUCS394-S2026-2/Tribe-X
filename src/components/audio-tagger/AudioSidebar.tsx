@@ -1,6 +1,19 @@
 import type { ReactElement } from 'react';
 
-export function AudioSidebar(): ReactElement {
+interface AudioSidebarProps {
+  activeView?: 'upload' | 'results' | 'history';
+  onGenerateClick?: () => void;
+  onHistoryOpen?: () => void;
+}
+
+export function AudioSidebar({
+  activeView = 'upload',
+  onGenerateClick,
+  onHistoryOpen,
+}: AudioSidebarProps): ReactElement {
+  const generateActive = activeView === 'upload' || activeView === 'results';
+  const historyActive = activeView === 'history';
+
   return (
     <aside className="flex w-[88px] shrink-0 flex-col items-center border-r border-[#0f1831] bg-[#071227] px-2 py-5 text-white shadow-[inset_-1px_0_0_rgba(255,255,255,0.04)]">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6ed1] to-[#4c3b99] shadow-lg shadow-violet-950/40">
@@ -20,7 +33,13 @@ export function AudioSidebar(): ReactElement {
         <div className="flex flex-col items-center gap-6">
           <button
             type="button"
-            className="flex h-[64px] w-[64px] flex-col items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-[#6f63c7] to-[#4c3b99] text-sm font-semibold text-white shadow-lg shadow-violet-950/30"
+            onClick={onGenerateClick}
+            title="Generate"
+            className={`flex h-[64px] w-[64px] flex-col items-center justify-center gap-1.5 rounded-xl text-sm font-semibold text-white shadow-lg shadow-violet-950/30 ${
+              generateActive
+                ? 'bg-gradient-to-br from-[#6f63c7] to-[#4c3b99]'
+                : 'bg-white/10 hover:bg-white/20'
+            }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -37,11 +56,18 @@ export function AudioSidebar(): ReactElement {
           </button>
 
           <button
-            disabled
-            title="History (coming soon)"
-            className="flex flex-col items-center gap-2 text-sm font-medium text-white/90 disabled:cursor-not-allowed"
+            type="button"
+            onClick={onHistoryOpen}
+            title="History"
+            className={`flex flex-col items-center gap-2 text-sm font-medium ${
+              historyActive ? 'text-white' : 'text-white/90 hover:text-white'
+            }`}
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white">
+            <span
+              className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
+                historyActive ? 'border-[#7c6ed1] bg-[#7c6ed1]/30' : 'border-white'
+              }`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

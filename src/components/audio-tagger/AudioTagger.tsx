@@ -11,6 +11,7 @@ import type {
 } from '../../shared/types/MusicTags';
 import { AccountMenu } from './AccountMenu';
 import { AudioSidebar } from './AudioSidebar';
+import { HistoryPage } from './HistoryPage';
 import { HistoryPanel } from './HistoryPanel';
 import { type ChatMessage, ResultsPage } from './ResultsPage';
 import { UploadPage } from './UploadPage';
@@ -55,12 +56,15 @@ function validateAudioFile(file: File): FileValidationError | null {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+type View = 'upload' | 'results' | 'history';
+
 interface AudioTaggerProps {
   displayName?: string;
   uid?: string;
 }
 
 export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.ReactElement {
+  const [view, setView] = useState<View>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<DiscoTags | null>(null);
@@ -116,6 +120,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
     setAnalysisId(null);
     setSaveError(null);
     setLoadedFileName(null);
+    setView('upload');
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -148,6 +153,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
           text: m.parts[0]?.text ?? '',
         })),
       );
+      setView('results');
 
       if (uid) {
         try {
@@ -194,11 +200,16 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
     setError(null);
     setSaveError(null);
     setValidationError(null);
+    setView('results');
   };
 
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden bg-white">
-      <AudioSidebar />
+      <AudioSidebar
+        activeView={view}
+        onGenerateClick={resetAll}
+        onHistoryOpen={uid ? () => setView('history') : undefined}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
         <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 py-4">
@@ -226,22 +237,9 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
           {displayName && <AccountMenu displayName={displayName} />}
         </header>
 
-        {!tags ? (
-          <UploadPage
-            file={file}
-            audioPreviewUrl={audioPreviewUrl}
-            inputRef={inputRef}
-            loading={loading}
-            error={error}
-            validationError={validationError}
-            onAnalyze={handleAnalyze}
-            onFileChange={handleFileChange}
-            onReset={resetAll}
-            historySlot={
-              uid ? <HistoryPanel uid={uid} onSelect={handleSelectHistory} /> : undefined
-            }
-          />
-        ) : (
+        {view === 'history' && uid ? (
+          <HistoryPage uid={uid} onSelect={handleSelectHistory} />
+        ) : view === 'results' && tags ? (
           <ResultsPage
             audioContext={audioContext}
             chatLoading={chatLoading}
@@ -261,6 +259,21 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
               setSuggestedTags(null);
             }}
             onDismissSuggested={() => setSuggestedTags(null)}
+          />
+        ) : (
+          <UploadPage
+            file={file}
+            audioPreviewUrl={audioPreviewUrl}
+            inputRef={inputRef}
+            loading={loading}
+            error={error}
+            validationError={validationError}
+            onAnalyze={handleAnalyze}
+            onFileChange={handleFileChange}
+            onReset={resetAll}
+            historySlot={
+              uid ? <HistoryPanel uid={uid} onSelect={handleSelectHistory} /> : undefined
+            }
           />
         )}
       </div>

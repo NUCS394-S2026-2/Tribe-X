@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import App from './App';
 
@@ -60,6 +60,11 @@ vi.mock('firebase/firestore', () => ({
 describe('App component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.setItem('geminiApiKey', 'test-key');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   test('renders the AudioTagger when user is authenticated', async () => {

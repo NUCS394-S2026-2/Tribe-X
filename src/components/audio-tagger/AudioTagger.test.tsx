@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as analyzeModule from '../../shared/api/analyzeMusicFile';
 import * as chatModule from '../../shared/api/chatWithGemini';
@@ -79,6 +79,11 @@ const mockChatResult: ChatResult = {
 describe('AudioTagger', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    localStorage.setItem('geminiApiKey', 'test-key');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('renders the file input and analyze button', () => {

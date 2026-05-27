@@ -10,18 +10,10 @@ import os
 import re
 import tempfile
 
-from dotenv import load_dotenv
 from google import genai
 from google.genai import types as genai_types
 import uvicorn
-
-_BACKEND_DIR = os.path.dirname(__file__)
-_ROOT_ENV = os.path.join(_BACKEND_DIR, "..", ".env")
-_BACKEND_ENV = os.path.join(_BACKEND_DIR, ".env")
-
-load_dotenv(dotenv_path=_ROOT_ENV)
-load_dotenv(dotenv_path=_BACKEND_ENV, override=True)
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError, field_validator
 
@@ -42,8 +34,18 @@ app.add_middleware(
 
 _tagger = MetaMusicTagger()
 
-_GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-_client = genai.Client(api_key=_GEMINI_API_KEY) if _GEMINI_API_KEY else None
+
+def _gemini_client(api_key: str) -> genai.Client:
+    return genai.Client(api_key=api_key)
+
+
+def _map_gemini_error(e: Exception) -> HTTPException:
+    msg = str(e).lower()
+    if "api_key_invalid" in msg or "api key not valid" in msg or "401" in msg:
+        return HTTPException(status_code=401, detail=json.dumps({"code": "INVALID_KEY", "message": "Invalid Gemini API key — please check and try again."}))
+    if "429" in msg or "quota" in msg or "rate" in msg:
+        return HTTPException(status_code=429, detail=json.dumps({"code": "RATE_LIMITED", "message": "Rate limit reached — please wait a moment and try again."}))
+    return HTTPException(status_code=500, detail=json.dumps({"code": "GEMINI_ERROR", "message": f"Gemini API error: {e}"}))
 
 SUPPORTED = {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".aiff", ".aif"}
 
@@ -156,29 +158,31 @@ def _extract_json(text: str) -> dict:
     return json.loads(text)
 
 
-def _call_gemini(audio_context: dict) -> dict:
-    if _client is None:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured")
-
+def _call_gemini(audio_context: dict, api_key: str) -> dict:
     prompt = _PROMPT_TEMPLATE.format(
         audio_context=json.dumps(audio_context, indent=2),
         taxonomy=DISCO_TAXONOMY,
     )
-
     try:
-        response = _client.models.generate_content(
+        response = _gemini_client(api_key).models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
         )
         return _extract_json(response.text)
     except json.JSONDecodeError as e:
-        raise HTTPException(status_code=500, detail=f"Gemini returned invalid JSON: {e}")
+        raise HTTPException(status_code=500, detail=json.dumps({"code": "GEMINI_ERROR", "message": f"Gemini returned invalid JSON: {e}"}))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini API error: {e}")
+        raise _map_gemini_error(e)
 
 
 @app.post("/analyze")
-async def analyze(file: UploadFile = File(...)):
+async def analyze(
+    file: UploadFile = File(...),
+    x_gemini_api_key: str | None = Header(default=None),
+):
+    if not x_gemini_api_key:
+        raise HTTPException(status_code=400, detail=json.dumps({"code": "NO_KEY", "message": "Please enter your Gemini API key."}))
+
     print(f"[analyze] request received, filename={file.filename}")
     ext = os.path.splitext(file.filename or "")[1].lower()
     print(f"[analyze] extension={ext}, supported={ext in SUPPORTED}")
@@ -201,7 +205,7 @@ async def analyze(file: UploadFile = File(...)):
 
     print("[analyze] calling Gemini...")
     try:
-        raw_tags = _call_gemini(audio_context)
+        raw_tags = _call_gemini(audio_context, x_gemini_api_key)
     except HTTPException as e:
         print(f"[analyze] Gemini FAILED: {e.detail}")
         raise
@@ -228,9 +232,9 @@ class ChatRequest(BaseModel):
 
 
 @app.post("/chat")
-async def chat(req: ChatRequest):
-    if _client is None:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured")
+async def chat(req: ChatRequest, x_gemini_api_key: str | None = Header(default=None)):
+    if not x_gemini_api_key:
+        raise HTTPException(status_code=400, detail=json.dumps({"code": "NO_KEY", "message": "Please enter your Gemini API key."}))
 
     system_instruction = _PROMPT_TEMPLATE.format(
         audio_context=json.dumps(req.audioContext, indent=2),
@@ -246,7 +250,7 @@ async def chat(req: ChatRequest):
     ]
 
     try:
-        chat_session = _client.chats.create(
+        chat_session = _gemini_client(x_gemini_api_key).chats.create(
             model="gemini-2.5-flash",
             history=history,
             config=genai_types.GenerateContentConfig(
@@ -269,9 +273,9 @@ async def chat(req: ChatRequest):
             "conversationHistory": updated_history,
         }
     except json.JSONDecodeError as e:
-        raise HTTPException(status_code=500, detail=f"Gemini returned invalid JSON: {e}")
+        raise HTTPException(status_code=500, detail=json.dumps({"code": "GEMINI_ERROR", "message": f"Gemini returned invalid JSON: {e}"}))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini API error: {e}")
+        raise _map_gemini_error(e)
 
 
 if __name__ == "__main__":

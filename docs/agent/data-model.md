@@ -41,6 +41,20 @@ export interface MusicTags {
 }
 ```
 
+## Shared `AnalysisRecord` Type — Story 0006
+
+```typescript
+// src/shared/api/saveAnalysis.ts
+export interface AnalysisRecord {
+  analysisId: string; // Firestore auto-generated doc ID
+  uid: string; // Firebase Auth UID — security rule key
+  fileName: string; // Original file name (display only)
+  tags: DiscoTags; // Full tag set at time of last save
+  audioContext: AudioContext;
+  analyzedAt: Timestamp | null; // null during pending server writes
+}
+```
+
 ## Firestore Collections
 
 Document each collection: path, document ID strategy, TypeScript type, subcollections.
@@ -63,6 +77,13 @@ Document each collection: path, document ID strategy, TypeScript type, subcollec
 - **Document ID**: Matches the corresponding `trackId`.
 - **Type**: `MusicTags`
 - **Purpose**: Results from the AI analysis (genres, instruments, etc.).
+
+### /analyses/{analysisId}
+- **Document ID**: Firestore auto-generated.
+- **Type**: `AnalysisRecord` (see `src/shared/api/saveAnalysis.ts`)
+- **Purpose**: Stores each completed analysis (tags + audio context) scoped to the owning user.
+- **Security**: Read/write restricted to `request.auth.uid == resource.data.uid`. See `firestore.rules`.
+- **Written by**: `saveAnalysis()` on analysis completion; updated by `updateAnalysisTags()` on tag edits (debounced 800 ms).
 ```
 
 Add a `###` section per collection; delete placeholders once real collections are defined.

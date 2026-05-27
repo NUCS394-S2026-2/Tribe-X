@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
 import { chatWithGemini } from '../../shared/api/chatWithGemini';
+import type { AnalysisRecord } from '../../shared/api/saveAnalysis';
+import { saveAnalysis, updateAnalysisTags } from '../../shared/api/saveAnalysis';
 import type {
   AudioContext,
   ConversationMessage,
@@ -9,6 +11,8 @@ import type {
 } from '../../shared/types/MusicTags';
 import { AccountMenu } from './AccountMenu';
 import { AudioSidebar } from './AudioSidebar';
+import { HistoryPage } from './HistoryPage';
+import { HistoryPanel } from './HistoryPanel';
 import { type ChatMessage, ResultsPage } from './ResultsPage';
 import { UploadPage } from './UploadPage';
 
@@ -52,11 +56,15 @@ function validateAudioFile(file: File): FileValidationError | null {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+type View = 'upload' | 'results' | 'history';
+
 interface AudioTaggerProps {
   displayName?: string;
+  uid?: string;
 }
 
-export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactElement {
+export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.ReactElement {
+  const [view, setView] = useState<View>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<DiscoTags | null>(null);
@@ -72,6 +80,9 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
   const [validationError, setValidationError] = useState<FileValidationError | null>(
     null,
   );
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,6 +99,15 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
     };
   }, [file]);
 
+  // Debounce tag edits back to Firestore whenever tags change after a save.
+  useEffect(() => {
+    if (!analysisId || !tags) return;
+    const timer = setTimeout(() => {
+      updateAnalysisTags(analysisId, tags).catch(() => {});
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [tags, analysisId]);
+
   const resetAll = () => {
     setFile(null);
     setTags(null);
@@ -97,6 +117,10 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
     setChatMessages([]);
     setError(null);
     setValidationError(null);
+    setAnalysisId(null);
+    setSaveError(null);
+    setLoadedFileName(null);
+    setView('upload');
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -117,6 +141,7 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
     if (!file) return;
     setLoading(true);
     setError(null);
+    setSaveError(null);
     try {
       const result = await analyzeMusicFile(file);
       setTags(result.tags);
@@ -128,6 +153,16 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
           text: m.parts[0]?.text ?? '',
         })),
       );
+      setView('results');
+
+      if (uid) {
+        try {
+          const id = await saveAnalysis(uid, file.name, result.tags, result.audioContext);
+          setAnalysisId(id);
+        } catch {
+          setSaveError('Could not save analysis — results shown locally only.');
+        }
+      }
     } catch (err) {
       console.error('Analysis error:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
@@ -153,9 +188,28 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
     }
   };
 
+  const handleSelectHistory = (record: AnalysisRecord) => {
+    setFile(null);
+    setTags(record.tags);
+    setAudioContext(record.audioContext);
+    setAnalysisId(record.analysisId);
+    setLoadedFileName(record.fileName);
+    setSuggestedTags(null);
+    setConversationHistory([]);
+    setChatMessages([]);
+    setError(null);
+    setSaveError(null);
+    setValidationError(null);
+    setView('results');
+  };
+
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden bg-white">
-      <AudioSidebar />
+      <AudioSidebar
+        activeView={view}
+        onGenerateClick={resetAll}
+        onHistoryOpen={uid ? () => setView('history') : undefined}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
         <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 py-4">
@@ -183,7 +237,30 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
           {displayName && <AccountMenu displayName={displayName} />}
         </header>
 
-        {!tags ? (
+        {view === 'history' && uid ? (
+          <HistoryPage uid={uid} onSelect={handleSelectHistory} />
+        ) : view === 'results' && tags ? (
+          <ResultsPage
+            audioContext={audioContext}
+            chatLoading={chatLoading}
+            chatMessages={chatMessages}
+            error={error}
+            file={file}
+            audioPreviewUrl={audioPreviewUrl}
+            tags={tags}
+            suggestedTags={suggestedTags}
+            saveError={saveError}
+            loadedFileName={loadedFileName}
+            onChat={handleChat}
+            onNewTrack={resetAll}
+            onTagsChange={setTags}
+            onSaveSuggested={() => {
+              if (suggestedTags) setTags(suggestedTags);
+              setSuggestedTags(null);
+            }}
+            onDismissSuggested={() => setSuggestedTags(null)}
+          />
+        ) : (
           <UploadPage
             file={file}
             audioPreviewUrl={audioPreviewUrl}
@@ -194,25 +271,9 @@ export function AudioTagger({ displayName }: AudioTaggerProps): React.ReactEleme
             onAnalyze={handleAnalyze}
             onFileChange={handleFileChange}
             onReset={resetAll}
-          />
-        ) : (
-          <ResultsPage
-            audioContext={audioContext}
-            chatLoading={chatLoading}
-            chatMessages={chatMessages}
-            error={error}
-            file={file}
-            audioPreviewUrl={audioPreviewUrl}
-            tags={tags}
-            suggestedTags={suggestedTags}
-            onChat={handleChat}
-            onNewTrack={resetAll}
-            onTagsChange={setTags}
-            onSaveSuggested={() => {
-              if (suggestedTags) setTags(suggestedTags);
-              setSuggestedTags(null);
-            }}
-            onDismissSuggested={() => setSuggestedTags(null)}
+            historySlot={
+              uid ? <HistoryPanel uid={uid} onSelect={handleSelectHistory} /> : undefined
+            }
           />
         )}
       </div>

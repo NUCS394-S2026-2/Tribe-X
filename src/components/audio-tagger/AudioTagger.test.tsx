@@ -4,8 +4,35 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as analyzeModule from '../../shared/api/analyzeMusicFile';
 import * as chatModule from '../../shared/api/chatWithGemini';
+import * as saveModule from '../../shared/api/saveAnalysis';
 import type { AnalyzeResult, ChatResult } from '../../shared/types/MusicTags';
 import { AudioTagger } from './AudioTagger';
+
+// Prevent real Firestore calls from HistoryPanel in tests that don't pass uid.
+vi.mock('../../shared/api/saveAnalysis', async (importOriginal) => {
+  const actual = await importOriginal<typeof saveModule>();
+  return {
+    ...actual,
+    saveAnalysis: vi.fn().mockResolvedValue('mock-analysis-id'),
+    updateAnalysisTags: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
+// HistoryPanel uses firebase/firestore directly; stub it out globally.
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn(),
+  query: vi.fn(),
+  where: vi.fn(),
+  orderBy: vi.fn(),
+  limit: vi.fn(),
+  onSnapshot: vi.fn(() => vi.fn()),
+  addDoc: vi.fn(),
+  updateDoc: vi.fn(),
+  doc: vi.fn(),
+  serverTimestamp: vi.fn(),
+}));
+
+vi.mock('../../shared/firebase', () => ({ db: {}, auth: {} }));
 
 const mockResult: AnalyzeResult = {
   audioContext: {
@@ -201,5 +228,50 @@ describe('AudioTagger', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
     expect(screen.getByRole('button', { name: /analyze/i })).toBeEnabled();
+  });
+
+  it('calls saveAnalysis with uid and file name after a successful analysis', async () => {
+    vi.spyOn(analyzeModule, 'analyzeMusicFile').mockResolvedValue(mockResult);
+    render(<AudioTagger uid="user-123" />);
+
+    const input = screen.getByLabelText(/select audio file/i);
+    await userEvent.upload(
+      input,
+      new File(['audio'], 'track.mp3', { type: 'audio/mpeg' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Electronic')).toBeInTheDocument();
+    });
+
+    expect(saveModule.saveAnalysis).toHaveBeenCalledWith(
+      'user-123',
+      'track.mp3',
+      mockResult.tags,
+      mockResult.audioContext,
+    );
+  });
+
+  it('shows a non-blocking save error when saveAnalysis rejects', async () => {
+    vi.spyOn(analyzeModule, 'analyzeMusicFile').mockResolvedValue(mockResult);
+    vi.spyOn(saveModule, 'saveAnalysis').mockRejectedValue(
+      new Error('Firestore offline'),
+    );
+    render(<AudioTagger uid="user-123" />);
+
+    const input = screen.getByLabelText(/select audio file/i);
+    await userEvent.upload(
+      input,
+      new File(['audio'], 'track.mp3', { type: 'audio/mpeg' }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: /analyze/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Electronic')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/could not save analysis/i)).toBeInTheDocument();
+    });
   });
 });

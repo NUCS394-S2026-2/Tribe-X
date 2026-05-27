@@ -46,6 +46,15 @@ vi.mock('firebase/firestore', () => ({
       }),
     }),
   ),
+  collection: vi.fn(),
+  query: vi.fn(),
+  where: vi.fn(),
+  orderBy: vi.fn(),
+  limit: vi.fn(),
+  onSnapshot: vi.fn(() => vi.fn()),
+  addDoc: vi.fn(),
+  updateDoc: vi.fn(),
+  serverTimestamp: vi.fn(),
 }));
 
 describe('App component', () => {

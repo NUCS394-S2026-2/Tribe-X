@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { AudioSidebar } from '../AudioSidebar';
 
@@ -18,12 +18,22 @@ describe('AudioSidebar', () => {
     expect(screen.getByRole('button', { name: /generate/i })).toBeEnabled();
   });
 
-  // Disabled placeholder items
+  // History button
 
-  it('renders the History button as disabled', () => {
+  it('renders the History button as enabled', () => {
     render(<AudioSidebar />);
-    expect(screen.getByRole('button', { name: /history/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /history/i })).toBeEnabled();
   });
+
+  it('calls onHistoryOpen when History button is clicked', async () => {
+    const { userEvent } = await import('@testing-library/user-event');
+    const onHistoryOpen = vi.fn();
+    render(<AudioSidebar onHistoryOpen={onHistoryOpen} />);
+    await userEvent.setup().click(screen.getByRole('button', { name: /history/i }));
+    expect(onHistoryOpen).toHaveBeenCalledOnce();
+  });
+
+  // Disabled placeholder items
 
   it('renders the Settings button as disabled', () => {
     render(<AudioSidebar />);
@@ -37,7 +47,6 @@ describe('AudioSidebar', () => {
 
   it('disabled buttons carry "coming soon" title attributes', () => {
     render(<AudioSidebar />);
-    expect(screen.getByTitle(/history \(coming soon\)/i)).toBeInTheDocument();
     expect(screen.getByTitle(/settings \(coming soon\)/i)).toBeInTheDocument();
     expect(screen.getByTitle(/help \(coming soon\)/i)).toBeInTheDocument();
   });

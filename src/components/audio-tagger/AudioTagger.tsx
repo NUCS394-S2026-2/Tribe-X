@@ -3,7 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { analyzeMusicFile } from '../../shared/api/analyzeMusicFile';
 import { chatWithGemini } from '../../shared/api/chatWithGemini';
 import type { AnalysisRecord } from '../../shared/api/saveAnalysis';
-import { saveAnalysis, updateAnalysisTags } from '../../shared/api/saveAnalysis';
+import {
+  saveAnalysis,
+  updateAnalysisStorageUrl,
+  updateAnalysisTags,
+  uploadAudioFile,
+} from '../../shared/api/saveAnalysis';
 import type {
   AudioContext,
   ConversationMessage,
@@ -117,10 +122,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!file || typeof URL.createObjectURL !== 'function') {
-      setAudioPreviewUrl(null);
-      return;
-    }
+    if (!file || typeof URL.createObjectURL !== 'function') return;
 
     const objectUrl = URL.createObjectURL(file);
     setAudioPreviewUrl(objectUrl);
@@ -141,6 +143,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
 
   const resetAll = () => {
     setFile(null);
+    setAudioPreviewUrl(null);
     setTags(null);
     setSuggestedTags(null);
     setAudioContext(null);
@@ -195,6 +198,10 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
         try {
           const id = await saveAnalysis(uid, file.name, result.tags, result.audioContext);
           setAnalysisId(id);
+          // Upload the audio file to Firebase Storage in the background.
+          uploadAudioFile(uid, id, file)
+            .then((url) => updateAnalysisStorageUrl(id, url))
+            .catch(() => {});
         } catch {
           setSaveError('Could not save analysis — results shown locally only.');
         }
@@ -231,6 +238,7 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
 
   const handleSelectHistory = (record: AnalysisRecord) => {
     setFile(null);
+    setAudioPreviewUrl(record.storageUrl ?? null);
     setTags(record.tags);
     setAudioContext(record.audioContext);
     setAnalysisId(record.analysisId);

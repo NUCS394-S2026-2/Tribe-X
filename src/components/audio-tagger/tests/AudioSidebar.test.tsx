@@ -33,6 +33,20 @@ describe('AudioSidebar', () => {
     expect(onHistoryOpen).toHaveBeenCalledOnce();
   });
 
+  // Help button
+
+  it('renders the Help button as enabled', () => {
+    render(<AudioSidebar />);
+    expect(screen.getByRole('button', { name: /help/i })).toBeEnabled();
+  });
+
+  it('opens the help modal when Help button is clicked', async () => {
+    const { userEvent } = await import('@testing-library/user-event');
+    render(<AudioSidebar />);
+    await userEvent.setup().click(screen.getByRole('button', { name: /help/i }));
+    expect(screen.getByRole('heading', { name: /help/i })).toBeInTheDocument();
+  });
+
   // Disabled placeholder items
 
   it('renders the Settings button as disabled', () => {
@@ -40,14 +54,8 @@ describe('AudioSidebar', () => {
     expect(screen.getByRole('button', { name: /settings/i })).toBeDisabled();
   });
 
-  it('renders the Help button as disabled', () => {
-    render(<AudioSidebar />);
-    expect(screen.getByRole('button', { name: /help/i })).toBeDisabled();
-  });
-
   it('disabled buttons carry "coming soon" title attributes', () => {
     render(<AudioSidebar />);
     expect(screen.getByTitle(/settings \(coming soon\)/i)).toBeInTheDocument();
-    expect(screen.getByTitle(/help \(coming soon\)/i)).toBeInTheDocument();
   });
 });

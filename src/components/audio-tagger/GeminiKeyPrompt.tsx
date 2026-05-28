@@ -14,9 +14,9 @@ export function GeminiKeyPrompt({ onSave }: GeminiKeyPromptProps): React.ReactEl
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-white p-8">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6ed1] to-[#4c3b99] text-white shadow-md shadow-violet-200">
+    <div className="flex flex-1 items-center justify-center bg-slate-950 p-8">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-8 shadow-sm shadow-black/20">
+        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf6] to-[#4c3b99] text-white shadow-md shadow-violet-950/40">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -31,20 +31,18 @@ export function GeminiKeyPrompt({ onSave }: GeminiKeyPromptProps): React.ReactEl
           </svg>
         </div>
 
-        <h2 className="mb-1 text-xl font-bold text-slate-950">
-          Enter your Gemini API key
-        </h2>
-        <p className="mb-6 text-sm text-slate-500">
+        <h2 className="mb-1 text-xl font-bold text-white">Enter your Gemini API key</h2>
+        <p className="mb-6 text-sm text-slate-400">
           Get a free key at{' '}
           <a
             href="https://aistudio.google.com/apikey"
             target="_blank"
             rel="noreferrer"
-            className="text-[#4f46a5] underline underline-offset-2 hover:text-[#7c6ed1]"
+            className="text-violet-300 underline underline-offset-2 hover:text-violet-100"
           >
             aistudio.google.com
           </a>
-          . Your key is stored locally and never sent to our servers.
+          . Your key is stored locally and sent only with analysis requests.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -53,12 +51,12 @@ export function GeminiKeyPrompt({ onSave }: GeminiKeyPromptProps): React.ReactEl
             placeholder="AIza..."
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-[#7c6ed1] focus:outline-none focus:ring-2 focus:ring-[#7c6ed1]/20"
+            className="w-full rounded-lg border border-white/10 bg-slate-950 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-violet-300 focus:outline-none focus:ring-2 focus:ring-violet-300/20"
           />
           <button
             type="submit"
             disabled={!value.trim()}
-            className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#4c3b99] px-4 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-40 hover:opacity-90"
+            className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#4c3b99] px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-950/40 disabled:opacity-40 hover:brightness-110"
           >
             Save key
           </button>

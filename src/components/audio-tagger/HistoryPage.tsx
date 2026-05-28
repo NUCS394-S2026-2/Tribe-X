@@ -56,31 +56,31 @@ export function HistoryPage({ uid, onSelect }: HistoryPageProps) {
   }, [uid]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-950">
       <div className="flex-1 overflow-y-auto px-8 py-6">
         <div className="mx-auto w-full max-w-[860px]">
-          <h2 className="mb-1 text-3xl font-bold tracking-tight text-slate-950">
+          <h2 className="mb-1 text-3xl font-bold tracking-tight text-white">
             Upload History
           </h2>
-          <p className="mb-6 text-base text-slate-600">
+          <p className="mb-6 text-base text-slate-400">
             All your previously analyzed tracks. Click one to load it.
           </p>
 
           {loading && (
-            <p className="text-center text-sm text-slate-500">Loading history…</p>
+            <p className="text-center text-sm text-slate-400">Loading history…</p>
           )}
 
           {queryError && (
-            <p className="text-center text-sm text-red-500">
+            <p className="text-center text-sm text-red-300">
               Could not load history. Check the browser console for details (a Firestore
               index may be missing).
             </p>
           )}
 
           {!loading && !queryError && records.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-8 py-16 text-center">
-              <p className="text-base font-medium text-slate-500">No uploads yet.</p>
-              <p className="mt-1 text-sm text-slate-400">
+            <div className="rounded-2xl border border-dashed border-white/10 bg-slate-900 px-8 py-16 text-center">
+              <p className="text-base font-medium text-slate-300">No uploads yet.</p>
+              <p className="mt-1 text-sm text-slate-500">
                 Analyze a track and it will appear here.
               </p>
             </div>
@@ -93,7 +93,7 @@ export function HistoryPage({ uid, onSelect }: HistoryPageProps) {
                   <button
                     type="button"
                     onClick={() => onSelect(record)}
-                    className="flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:border-[#5b50b6] hover:bg-violet-50/30"
+                    className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-left shadow-sm shadow-black/20 transition-colors hover:border-violet-300/60 hover:bg-slate-800"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6ed1] to-[#4f46a5] text-white">
                       <svg
@@ -106,7 +106,7 @@ export function HistoryPage({ uid, onSelect }: HistoryPageProps) {
                       </svg>
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-900">
+                      <p className="truncate text-sm font-semibold text-white">
                         {record.fileName}
                       </p>
                       <p className="mt-0.5 text-xs text-slate-500">

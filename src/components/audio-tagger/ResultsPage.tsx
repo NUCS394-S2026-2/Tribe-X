@@ -164,7 +164,7 @@ function CheckCircleIcon() {
 
 function TagPills({ items }: { items: string[] }) {
   if (!items.length) {
-    return <span className="text-sm font-medium text-slate-400">(none)</span>;
+    return <span className="text-sm font-medium text-slate-500">(none)</span>;
   }
 
   return (
@@ -172,7 +172,7 @@ function TagPills({ items }: { items: string[] }) {
       {items.map((item) => (
         <span
           key={item}
-          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
+          className="rounded-full border border-white/10 bg-slate-900 px-3 py-1 text-sm font-semibold text-slate-100 shadow-sm"
         >
           {item}
         </span>
@@ -243,7 +243,7 @@ function InteractiveTagPills({
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
         {items.length === 0 && editingIndex === null && (
-          <span className="text-sm font-medium text-slate-400">(none)</span>
+          <span className="text-sm font-medium text-slate-500">(none)</span>
         )}
         {items.map((item, index) =>
           editingIndex === index ? (
@@ -273,12 +273,12 @@ function InteractiveTagPills({
                   setEditingIndex(null);
                 }
               }}
-              className="rounded-full border border-violet-400 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none ring-1 ring-violet-400"
+              className="rounded-full border border-violet-300 bg-slate-950 px-3 py-1 text-sm font-semibold text-slate-100 shadow-sm outline-none ring-1 ring-violet-300"
             />
           ) : (
             <span
               key={item}
-              className="group inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
+              className="group inline-flex items-center gap-1 rounded-full border border-white/10 bg-slate-900 px-3 py-1 text-sm font-semibold text-slate-100 shadow-sm"
             >
               <span
                 role="button"
@@ -299,7 +299,7 @@ function InteractiveTagPills({
                 type="button"
                 aria-label={`Remove tag ${item}`}
                 onClick={() => handleRemove(index)}
-                className="ml-0.5 rounded-full text-slate-400 opacity-0 transition-opacity hover:text-slate-700 group-hover:opacity-100 focus:opacity-100"
+                className="ml-0.5 rounded-full text-slate-500 opacity-0 transition-opacity hover:text-slate-100 group-hover:opacity-100 focus:opacity-100"
               >
                 ×
               </button>
@@ -330,12 +330,12 @@ function InteractiveTagPills({
               }
             }
           }}
-          className="w-28 rounded-full border border-dashed border-slate-300 bg-transparent px-3 py-0.5 text-sm text-slate-600 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400"
+          className="w-28 rounded-full border border-dashed border-slate-600 bg-transparent px-3 py-0.5 text-sm text-slate-300 placeholder:text-slate-500 focus:border-violet-300 focus:outline-none focus:ring-1 focus:ring-violet-300"
         />
         <button
           type="submit"
           disabled={!addValue.trim()}
-          className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-sm font-semibold text-slate-600 shadow-sm hover:border-violet-400 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full border border-white/10 bg-slate-900 px-2.5 py-0.5 text-sm font-semibold text-slate-300 shadow-sm hover:border-violet-300 hover:text-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
         >
           +
         </button>
@@ -386,7 +386,7 @@ function EditableSingleValue({
             setEditing(false);
           }
         }}
-        className="rounded-full border border-violet-400 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm outline-none ring-1 ring-violet-400"
+        className="rounded-full border border-violet-300 bg-slate-950 px-3 py-1 text-sm font-semibold text-slate-100 shadow-sm outline-none ring-1 ring-violet-300"
       />
     );
   }
@@ -397,7 +397,7 @@ function EditableSingleValue({
         role="button"
         tabIndex={0}
         aria-label="Edit tempo"
-        className="cursor-text text-sm font-medium text-slate-400"
+        className="cursor-text text-sm font-medium text-slate-500"
         onDoubleClick={startEdit}
         onKeyDown={(e) => {
           if (e.key === 'Enter') startEdit();
@@ -413,7 +413,7 @@ function EditableSingleValue({
       role="button"
       tabIndex={0}
       aria-label={`Edit tempo: ${value}`}
-      className="cursor-text rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900 shadow-sm"
+      className="cursor-text rounded-full border border-white/10 bg-slate-900 px-3 py-1 text-sm font-semibold text-slate-100 shadow-sm"
       onDoubleClick={startEdit}
       onKeyDown={(e) => {
         if (e.key === 'Enter') startEdit();
@@ -433,7 +433,7 @@ function Confidence({ audioContext }: { audioContext: AudioContext | null }) {
   const confidence = audioContext ? Math.round(audioContext.key_strength * 100) : null;
 
   return (
-    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+    <div className="flex items-center gap-2 text-sm font-semibold text-slate-400">
       <span>Confidence</span>
       <span className="text-emerald-500">
         {confidence === null ? '-' : `${confidence}%`}
@@ -444,9 +444,9 @@ function Confidence({ audioContext }: { audioContext: AudioContext | null }) {
 
 function ReasoningCard({ message }: { message?: string }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h3 className="text-base font-bold text-slate-950">Why these tags?</h3>
-      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">
+    <section className="rounded-xl border border-white/10 bg-slate-900 p-4 shadow-sm shadow-black/20">
+      <h3 className="text-base font-bold text-white">Why these tags?</h3>
+      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-300">
         {message ||
           'The tags reflect the measured tempo, energy, rhythm, and tonal features detected in the uploaded track.'}
       </p>
@@ -464,12 +464,12 @@ function OverviewPanel({ tags }: { tags: DiscoTags }) {
 
   return (
     <section className="grid gap-4 md:grid-cols-2">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-950">Tags found</h3>
+      <div className="rounded-xl border border-white/10 bg-slate-900 p-4 shadow-sm shadow-black/20">
+        <h3 className="text-sm font-bold text-white">Tags found</h3>
         <div className="mt-3 flex flex-col gap-3">
           {foundSections.map((section) => (
             <div key={section.key}>
-              <p className="text-xs font-semibold uppercase text-slate-400">
+              <p className="text-xs font-semibold uppercase text-slate-500">
                 {section.label}
               </p>
               <div className="mt-1">
@@ -480,21 +480,21 @@ function OverviewPanel({ tags }: { tags: DiscoTags }) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-950">Tags not found</h3>
+      <div className="rounded-xl border border-white/10 bg-slate-900 p-4 shadow-sm shadow-black/20">
+        <h3 className="text-sm font-bold text-white">Tags not found</h3>
         {missingSections.length ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {missingSections.map((section) => (
               <span
                 key={section.key}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-500"
+                className="rounded-full border border-white/10 bg-slate-950 px-3 py-1 text-sm font-semibold text-slate-400"
               >
                 {section.label}
               </span>
             ))}
           </div>
         ) : (
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="mt-3 text-sm text-slate-400">
             All tag categories include at least one value.
           </p>
         )}
@@ -505,9 +505,9 @@ function OverviewPanel({ tags }: { tags: DiscoTags }) {
 
 function SimilarTracksPanel({ tags }: { tags: DiscoTags }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h3 className="text-sm font-bold text-slate-950">Similar tracks</h3>
-      <p className="mt-1 text-sm text-slate-500">
+    <section className="rounded-xl border border-white/10 bg-slate-900 p-4 shadow-sm shadow-black/20">
+      <h3 className="text-sm font-bold text-white">Similar tracks</h3>
+      <p className="mt-1 text-sm text-slate-400">
         Artist references returned by the analysis.
       </p>
       <div className="mt-4">
@@ -534,15 +534,15 @@ function ChatMessages({
           key={`${message.role}-${index}-${message.text}`}
           className={`rounded-xl px-4 py-2.5 text-sm ${
             message.role === 'user'
-              ? 'ml-auto max-w-[80%] bg-[#f1effb] text-slate-900'
-              : 'mr-auto max-w-[80%] border border-slate-200 bg-white text-slate-700'
+              ? 'ml-auto max-w-[80%] bg-violet-500/20 text-violet-50'
+              : 'mr-auto max-w-[80%] border border-white/10 bg-slate-900 text-slate-300'
           }`}
         >
           {message.text}
         </div>
       ))}
       {loading && (
-        <div className="mr-auto rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm italic text-slate-400">
+        <div className="mr-auto rounded-xl border border-white/10 bg-slate-900 px-4 py-2.5 text-sm italic text-slate-500">
           Thinking...
         </div>
       )}
@@ -570,12 +570,12 @@ function ChatInputBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-2.5 rounded-xl border border-violet-200/70 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-2 shadow-sm shadow-violet-100/70"
+      className="flex items-center gap-2.5 rounded-xl border border-violet-300/20 bg-slate-900 p-2 shadow-sm shadow-black/20"
     >
       <div className="min-w-0 flex-1 px-1">
         <label
           htmlFor="tag-adjustment"
-          className="block text-sm font-bold text-slate-700"
+          className="block text-sm font-bold text-slate-200"
         >
           Give feedback on the analysis
         </label>
@@ -586,13 +586,13 @@ function ChatInputBar({
           onChange={(event) => setInput(event.target.value)}
           placeholder='e.g. "make the mood darker"'
           disabled={loading}
-          className="mt-0.5 w-full border-0 bg-transparent text-sm text-slate-500 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
+          className="mt-0.5 w-full border-0 bg-transparent text-sm text-slate-300 placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
         />
       </div>
       <button
         type="submit"
         disabled={!input.trim() || loading}
-        className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#5b50b6] px-4 py-2 text-sm font-bold text-white shadow-sm shadow-violet-200 transition hover:brightness-105 disabled:cursor-not-allowed disabled:from-violet-100 disabled:to-violet-100 disabled:text-violet-300 disabled:shadow-none"
+        className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#5b50b6] px-4 py-2 text-sm font-bold text-white shadow-sm shadow-violet-950/40 transition hover:brightness-110 disabled:cursor-not-allowed disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none"
       >
         Send
       </button>
@@ -612,29 +612,29 @@ function SuggestedTagsPanel({
   return (
     <section
       aria-label="Suggested tags"
-      className="rounded-xl border border-violet-200 bg-violet-50/40 p-4 shadow-sm"
+      className="rounded-xl border border-violet-300/30 bg-violet-400/10 p-4 shadow-sm shadow-black/20"
     >
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-slate-950">Suggested tags</h3>
+        <h3 className="text-sm font-bold text-white">Suggested tags</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 shadow-sm hover:border-slate-300 hover:text-slate-800"
+            className="rounded-lg border border-white/10 bg-slate-900 px-3 py-1.5 text-sm font-semibold text-slate-300 shadow-sm hover:border-slate-500 hover:text-white"
           >
             Dismiss
           </button>
           <button
             type="button"
             onClick={onSave}
-            className="rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] px-3 py-1.5 text-sm font-bold text-white shadow-sm shadow-violet-200 hover:brightness-105"
+            className="rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#5b50b6] px-3 py-1.5 text-sm font-bold text-white shadow-sm shadow-violet-950/40 hover:brightness-110"
           >
             Save
           </button>
         </div>
       </div>
 
-      <div className="mt-3 divide-y divide-violet-100">
+      <div className="mt-3 divide-y divide-violet-300/20">
         {tagSections.map((section) => {
           const items =
             section.key === 'tempo'
@@ -644,7 +644,7 @@ function SuggestedTagsPanel({
               : suggestedTags[section.key];
           return (
             <div key={section.key} className="flex items-baseline gap-3 py-2">
-              <span className="w-28 shrink-0 text-xs font-semibold uppercase text-slate-400">
+              <span className="w-28 shrink-0 text-xs font-semibold uppercase text-slate-500">
                 {section.label}
               </span>
               <TagPills items={items} />
@@ -685,13 +685,13 @@ export function ResultsPage({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-4">
+    <div className="flex-1 overflow-y-auto bg-slate-950 px-8 py-6">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onNewTrack}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#5b50b6] hover:text-[#44378f]"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-violet-300 hover:text-violet-100"
           >
             <span aria-hidden="true">←</span>
             Back to upload
@@ -703,7 +703,7 @@ export function ResultsPage({
               onClick={() =>
                 downloadText(buildCSV(tags), 'disco-tags.csv', 'text/csv;charset=utf-8;')
               }
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm hover:border-[#5b50b6] hover:text-[#5b50b6]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm font-bold text-slate-200 shadow-sm shadow-black/20 hover:border-violet-300 hover:text-violet-200"
             >
               <DownloadIcon />
               CSV
@@ -711,7 +711,7 @@ export function ResultsPage({
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6b5bd6] to-[#4f46a5] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-violet-200"
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#7c6ed1] to-[#5b50b6] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-violet-950/40"
             >
               <CopyIcon />
               {copied ? 'Copied!' : 'Copy All Tags'}
@@ -719,18 +719,18 @@ export function ResultsPage({
           </div>
         </div>
 
-        <section className="grid gap-4 rounded-xl border border-violet-100 bg-violet-50/30 px-4 py-3 shadow-sm lg:grid-cols-[68px_1fr_auto]">
-          <span className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7c6ed1] to-[#4f46a5] text-white shadow-lg shadow-violet-200">
+        <section className="grid gap-4 rounded-xl border border-violet-300/20 bg-slate-900 px-4 py-3 shadow-sm shadow-black/20 lg:grid-cols-[68px_1fr_auto]">
+          <span className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#8b7cf6] to-[#5b50b6] text-white shadow-lg shadow-violet-950/40">
             <MusicNoteIcon className="h-9 w-9" />
           </span>
 
           <div className="min-w-0">
             <p className="flex min-w-0 items-center gap-2">
-              <span className="truncate text-base font-bold text-slate-950">
+              <span className="truncate text-base font-bold text-white">
                 {displayFileName}
               </span>
             </p>
-            <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
+            <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-slate-400">
               <span>
                 {file ? fileExtension(file.name) : fileExtension(displayFileName)}
               </span>
@@ -756,12 +756,12 @@ export function ResultsPage({
               ) : (
                 <>
                   <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#6f63c7] to-[#4f46a5] text-white shadow-md shadow-violet-200"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7c6ed1] to-[#5b50b6] text-white shadow-md shadow-violet-950/40"
                     aria-hidden="true"
                   >
                     ▶
                   </span>
-                  <span className="text-sm font-semibold text-slate-500">0:00</span>
+                  <span className="text-sm font-semibold text-slate-400">0:00</span>
                 </>
               )}
               <div
@@ -771,7 +771,7 @@ export function ResultsPage({
                 {waveformBars.map((height, index) => (
                   <span
                     key={`${height}-${index}`}
-                    className="w-1 shrink-0 rounded-full bg-violet-200"
+                    className="w-1 shrink-0 rounded-full bg-violet-300/40"
                     style={{ height }}
                   />
                 ))}
@@ -779,13 +779,13 @@ export function ResultsPage({
             </div>
           </div>
 
-          <div className="flex items-start gap-2 whitespace-nowrap text-sm font-medium text-slate-500">
+          <div className="flex items-start gap-2 whitespace-nowrap text-sm font-medium text-slate-400">
             <CheckCircleIcon />
             <span>Analyzed just now</span>
           </div>
         </section>
 
-        <div className="flex items-center justify-between border-b border-slate-200">
+        <div className="flex items-center justify-between border-b border-white/10">
           <div className="flex items-center gap-9">
             {tabs.map((tab) => (
               <button
@@ -794,8 +794,8 @@ export function ResultsPage({
                 onClick={() => setActiveTab(tab)}
                 className={`pb-2.5 text-sm font-semibold ${
                   activeTab === tab
-                    ? 'border-b-4 border-[#5b50b6] text-slate-950'
-                    : 'border-b-4 border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'border-b-4 border-violet-300 text-white'
+                    : 'border-b-4 border-transparent text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {tab}
@@ -807,11 +807,11 @@ export function ResultsPage({
 
         {activeTab === 'Tags' && (
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <section className="divide-y divide-slate-200">
+            <section className="divide-y divide-white/10">
               {tagSections.map((section) => (
                 <div key={section.key} className="py-3">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-950">{section.label}</h3>
+                    <h3 className="text-sm font-bold text-white">{section.label}</h3>
                     <div className="mt-2">
                       {section.key === 'tempo' ? (
                         <EditableSingleValue
@@ -849,7 +849,7 @@ export function ResultsPage({
           <ChatInputBar loading={chatLoading} onSend={onChat} />
           <ChatMessages messages={chatMessages} loading={chatLoading} />
           {error && (
-            <p role="alert" className="mt-3 text-sm text-red-600">
+            <p role="alert" className="mt-3 text-sm text-red-300">
               {error}
             </p>
           )}
@@ -864,12 +864,12 @@ export function ResultsPage({
         )}
 
         {saveError && (
-          <p className="rounded-lg bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700">
+          <p className="rounded-lg border border-amber-300/20 bg-amber-400/10 px-4 py-2.5 text-sm font-medium text-amber-200">
             {saveError}
           </p>
         )}
 
-        <p className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500">
+        <p className="rounded-lg border border-white/10 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-400">
           These tags are AI generated. Please review before use.
         </p>
       </div>

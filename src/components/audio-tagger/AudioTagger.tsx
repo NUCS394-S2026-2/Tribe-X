@@ -20,9 +20,11 @@ import { GeminiKeyPrompt } from './GeminiKeyPrompt';
 import { HistoryPage } from './HistoryPage';
 import { HistoryPanel } from './HistoryPanel';
 import { type ChatMessage, ResultsPage } from './ResultsPage';
+import { type ThemeMode, ThemeToggle } from './ThemeToggle';
 import { UploadPage } from './UploadPage';
 
 const GEMINI_KEY_STORAGE = 'geminiApiKey';
+const THEME_STORAGE = 'metamusicTheme';
 
 function mapApiError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
@@ -100,6 +102,10 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
   const [geminiKey, setGeminiKey] = useState<string>(
     () => localStorage.getItem(GEMINI_KEY_STORAGE) ?? '',
   );
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const stored = localStorage.getItem(THEME_STORAGE);
+    return stored === 'light' || stored === 'dark' ? stored : 'light';
+  });
   const [view, setView] = useState<View>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [tags, setTags] = useState<DiscoTags | null>(null);
@@ -174,6 +180,14 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
   const handleSaveKey = (key: string) => {
     localStorage.setItem(GEMINI_KEY_STORAGE, key);
     setGeminiKey(key);
+  };
+
+  const handleToggleTheme = () => {
+    setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_STORAGE, next);
+      return next;
+    });
   };
 
   const handleAnalyze = async () => {
@@ -253,17 +267,17 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
   };
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden bg-white">
+    <div className={`theme-${theme} flex min-h-0 flex-1 overflow-hidden bg-slate-950`}>
       <AudioSidebar
         activeView={view}
         onGenerateClick={resetAll}
         onHistoryOpen={uid ? () => setView('history') : undefined}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
-        <header className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 py-4">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-slate-950">
+        <header className="flex shrink-0 items-center justify-between border-b border-white/10 bg-slate-950 px-8 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6ed1] to-[#4c3b99] text-white shadow-md shadow-violet-200">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#8b7cf6] to-[#4c3b99] text-white shadow-md shadow-violet-950/40">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -274,20 +288,19 @@ export function AudioTagger({ displayName, uid }: AudioTaggerProps): React.React
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-950">
-                MetaMusic
-              </h1>
-              <p className="mt-0.5 text-base font-semibold text-[#4f46a5]">
+              <h1 className="text-xl font-bold tracking-tight text-white">MetaMusic</h1>
+              <p className="mt-0.5 text-base font-semibold text-violet-300">
                 Tag Generator
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle theme={theme} onToggle={handleToggleTheme} />
             {geminiKey && (
               <button
                 onClick={() => handleSaveKey('')}
-                className="text-xs text-slate-400 underline underline-offset-2 hover:text-slate-600"
+                className="text-xs font-semibold text-slate-400 underline underline-offset-2 hover:text-violet-200"
               >
                 Change API key
               </button>

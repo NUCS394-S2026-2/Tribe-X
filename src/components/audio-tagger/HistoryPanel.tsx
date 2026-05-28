@@ -60,9 +60,9 @@ export function HistoryPanel({ uid, onSelect }: HistoryPanelProps) {
     return (
       <section
         aria-label="Analysis history"
-        className="shrink-0 border-t border-slate-200 bg-slate-50 px-8 py-4"
+        className="shrink-0 border-t border-white/10 bg-slate-950 px-8 py-4"
       >
-        <p className="text-xs text-red-500">
+        <p className="text-xs text-red-300">
           Could not load history. Check the browser console for details (a Firestore index
           may be missing).
         </p>
@@ -74,7 +74,7 @@ export function HistoryPanel({ uid, onSelect }: HistoryPanelProps) {
   return (
     <section
       aria-label="Analysis history"
-      className="shrink-0 border-t border-slate-200 bg-slate-50 px-8 py-4"
+      className="shrink-0 border-t border-white/10 bg-slate-950 px-8 py-4"
     >
       <button
         type="button"
@@ -82,7 +82,7 @@ export function HistoryPanel({ uid, onSelect }: HistoryPanelProps) {
         className="flex w-full items-center justify-between"
         aria-expanded={!collapsed}
       >
-        <h2 className="text-sm font-bold text-slate-700">Recent Analyses</h2>
+        <h2 className="text-sm font-bold text-slate-200">Recent Analyses</h2>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -105,7 +105,7 @@ export function HistoryPanel({ uid, onSelect }: HistoryPanelProps) {
               <button
                 type="button"
                 onClick={() => onSelect(record)}
-                className="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left shadow-sm hover:border-[#5b50b6] hover:bg-violet-50/30"
+                className="flex w-full items-center gap-3 rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-left shadow-sm shadow-black/20 hover:border-violet-300/60 hover:bg-slate-800"
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#7c6ed1] to-[#4f46a5] text-white">
                   <svg
@@ -118,7 +118,7 @@ export function HistoryPanel({ uid, onSelect }: HistoryPanelProps) {
                   </svg>
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900">
+                  <p className="truncate text-sm font-semibold text-white">
                     {record.fileName}
                   </p>
                   <p className="mt-0.5 text-xs text-slate-500">

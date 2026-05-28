@@ -32,16 +32,17 @@ describe('AccountMenu', () => {
     vi.clearAllMocks();
   });
 
-  // Display name
+  // Account identity
 
-  it('renders the displayName prop', () => {
+  it('renders initials from the displayName prop', () => {
     render(<AccountMenu displayName="Alice Smith" />);
-    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.getByText('AS')).toBeInTheDocument();
   });
 
-  it('renders the "Signed in as" label', () => {
+  it('shows the displayName in the open menu', async () => {
     render(<AccountMenu displayName="Alice Smith" />);
-    expect(screen.getByText(/signed in as/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /open account menu/i }));
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
   });
 
   // Dropdown closed by default

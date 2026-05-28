@@ -1,1 +1,97 @@
 @import 'tailwindcss';
+
+.theme-light [class~='bg-slate-950'] {
+  background-color: #ffffff;
+}
+
+.theme-light [class~='bg-slate-900'],
+.theme-light [class~='bg-slate-900/70'] {
+  background-color: #ffffff;
+}
+
+.theme-light [class~='bg-slate-800'] {
+  background-color: #f8fafc;
+}
+
+.theme-light [class~='border-white/10'],
+.theme-light [class~='border-violet-300/20'],
+.theme-light [class~='border-violet-300/30'] {
+  border-color: #e2e8f0;
+}
+
+.theme-light [class~='text-white'],
+.theme-light [class~='text-slate-100'],
+.theme-light [class~='text-slate-200'] {
+  color: #020617;
+}
+
+.theme-light [class~='text-slate-300'] {
+  color: #334155;
+}
+
+.theme-light [class~='text-slate-400'],
+.theme-light [class~='text-slate-500'] {
+  color: #64748b;
+}
+
+.theme-light [class~='text-violet-300'],
+.theme-light [class~='text-violet-200'] {
+  color: #4f46a5;
+}
+
+.theme-light [class~='bg-violet-400/10'],
+.theme-light [class~='bg-violet-500/20'] {
+  background-color: #f1effb;
+}
+
+.theme-light [class~='border-violet-300/20'][class~='bg-slate-900'] {
+  background-color: rgb(245 243 255 / 0.3);
+  border-color: #ede9fe;
+}
+
+.theme-light [class~='border-violet-300/30'][class~='bg-violet-400/10'] {
+  background-color: rgb(245 243 255 / 0.4);
+  border-color: #ddd6fe;
+}
+
+.theme-light [class~='bg-slate-900/70'][class~='text-slate-100'] {
+  color: #020617;
+}
+
+.theme-light [class~='bg-slate-900/70'][class~='border-white/10'] {
+  border-color: #e2e8f0;
+}
+
+.theme-light aside[class*='bg-[#071227]'] {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: inset -1px 0 0 rgb(15 23 42 / 0.06);
+  color: #334155;
+}
+
+.theme-light aside[class*='bg-[#071227]'] [class~='text-white'],
+.theme-light aside[class*='bg-[#071227]'] [class~='text-white/90'] {
+  color: #334155;
+}
+
+.theme-light aside[class*='bg-[#071227]'] [class~='border-white'] {
+  border-color: #64748b;
+}
+
+.theme-light
+  aside[class*='bg-[#071227]']
+  [class*='from-[#6f63c7]'][class*='to-[#4c3b99]'] {
+  color: #ffffff;
+}
+
+.theme-light button[class~='disabled:from-slate-800']:disabled {
+  --tw-gradient-from: #ede9fe var(--tw-gradient-from-position);
+  --tw-gradient-to: #ede9fe var(--tw-gradient-to-position);
+  color: #8b7cf6;
+}
+
+.theme-light [class~='shadow-black/20'],
+.theme-light [class~='shadow-black/30'],
+.theme-light [class~='shadow-black/40'] {
+  --tw-shadow-color: rgb(148 163 184 / 0.3);
+}

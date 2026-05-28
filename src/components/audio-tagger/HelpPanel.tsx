@@ -10,12 +10,12 @@ export function HelpPanel({ isOpen, onClose }: HelpModalProps): ReactElement | n
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="flex max-h-[90vh] w-full max-w-md flex-col rounded-lg bg-[#0f1831] p-6 shadow-2xl">
+      <div className="help-panel flex max-h-[90vh] w-full max-w-md flex-col rounded-xl border border-white/10 bg-[#0f1831] p-6 shadow-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Help</h2>
+          <h2 className="help-panel-title text-xl font-semibold text-white">Help</h2>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white"
+            className="help-panel-close rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white"
             aria-label="Close help"
           >
             <svg
@@ -33,37 +33,51 @@ export function HelpPanel({ isOpen, onClose }: HelpModalProps): ReactElement | n
         </div>
 
         <div className="flex-1 overflow-y-auto pr-2">
-          <div className="space-y-3 text-white/80">
+          <div className="help-panel-body space-y-3 text-white/80">
             <div>
-              <h3 className="mb-2 font-semibold text-white">Getting Started</h3>
+              <h3 className="help-panel-title mb-2 font-semibold text-white">
+                Getting Started
+              </h3>
               <ol className="space-y-2 text-sm">
                 <li>
-                  <span className="font-medium text-white">1. Sign In</span> — Click the
-                  Sign In button and authenticate using your Google account.
+                  <span className="help-panel-title font-medium text-white">
+                    1. Sign In
+                  </span>{' '}
+                  — Click the Sign In button and authenticate using your Google account.
                 </li>
                 <li>
-                  <span className="font-medium text-white">2. Upload Audio</span> — Go to
-                  the Generate tab and upload an audio file (MP3). Maximum file size is
-                  50MB.
+                  <span className="help-panel-title font-medium text-white">
+                    2. Upload Audio
+                  </span>{' '}
+                  — Go to the Generate tab and upload an audio file (MP3). Maximum file
+                  size is 50MB.
                 </li>
                 <li>
-                  <span className="font-medium text-white">3. Analyze</span> — Click the
-                  Analyze button to process your audio file. The app will generate tags
-                  describing the music.
+                  <span className="help-panel-title font-medium text-white">
+                    3. Analyze
+                  </span>{' '}
+                  — Click the Analyze button to process your audio file. The app will
+                  generate tags describing the music.
                 </li>
                 <li>
-                  <span className="font-medium text-white">4. Review Tags</span> — Once
-                  analysis completes, view the generated tags and insights on the Results
-                  page.
+                  <span className="help-panel-title font-medium text-white">
+                    4. Review Tags
+                  </span>{' '}
+                  — Once analysis completes, view the generated tags and insights on the
+                  Results page.
                 </li>
                 <li>
-                  <span className="font-medium text-white">5. Edit Tags</span> —
-                  Double-click any tag to edit it, or use the × button to remove tags. Add
-                  new tags using the text input below each section.
+                  <span className="help-panel-title font-medium text-white">
+                    5. Edit Tags
+                  </span>{' '}
+                  — Double-click any tag to edit it, or use the × button to remove tags.
+                  Add new tags using the text input below each section.
                 </li>
                 <li>
-                  <span className="font-medium text-white">6. View History</span> — Click
-                  the History tab to see all your previous analyses and results.
+                  <span className="help-panel-title font-medium text-white">
+                    6. View History
+                  </span>{' '}
+                  — Click the History tab to see all your previous analyses and results.
                 </li>
               </ol>
             </div>

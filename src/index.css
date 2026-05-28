@@ -90,6 +90,28 @@
   color: #8b7cf6;
 }
 
+.theme-light .help-panel {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.theme-light .help-panel-title {
+  color: #020617;
+}
+
+.theme-light .help-panel-body {
+  color: #475569;
+}
+
+.theme-light .help-panel-close {
+  color: #64748b;
+}
+
+.theme-light .help-panel-close:hover {
+  background-color: #f1f5f9;
+  color: #020617;
+}
+
 .theme-light [class~='shadow-black/20'],
 .theme-light [class~='shadow-black/30'],
 .theme-light [class~='shadow-black/40'] {

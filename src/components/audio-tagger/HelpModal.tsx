@@ -32,10 +32,41 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps): ReactElement | n
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="space-y-4 text-white/80">
-            {/* TODO: Add your help content here */}
-            <p className="text-sm">Placeholder</p>
+        <div className="flex-1 overflow-y-auto pr-2">
+          <div className="space-y-3 text-white/80">
+            <div>
+              <h3 className="mb-2 font-semibold text-white">Getting Started</h3>
+              <ol className="space-y-2 text-sm">
+                <li>
+                  <span className="font-medium text-white">1. Sign In</span> — Click the
+                  Sign In button and authenticate using your Google account.
+                </li>
+                <li>
+                  <span className="font-medium text-white">2. Upload Audio</span> — Go to
+                  the Generate tab and upload an audio file (MP3, WAV, FLAC, OGG, M4A, or
+                  AIFF). Maximum file size is 50MB.
+                </li>
+                <li>
+                  <span className="font-medium text-white">3. Analyze</span> — Click the
+                  Analyze button to process your audio file. The app will generate tags
+                  describing the music.
+                </li>
+                <li>
+                  <span className="font-medium text-white">4. Review Tags</span> — Once
+                  analysis completes, view the generated tags and insights on the Results
+                  page.
+                </li>
+                <li>
+                  <span className="font-medium text-white">5. Edit Tags</span> —
+                  Double-click any tag to edit it, or use the × button to remove tags. Add
+                  new tags using the text input below each section.
+                </li>
+                <li>
+                  <span className="font-medium text-white">6. View History</span> — Click
+                  the History tab to see all your previous analyses and results.
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
 

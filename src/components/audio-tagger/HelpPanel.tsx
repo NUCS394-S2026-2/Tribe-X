@@ -5,7 +5,7 @@ interface HelpModalProps {
   onClose: () => void;
 }
 
-export function HelpModal({ isOpen, onClose }: HelpModalProps): ReactElement | null {
+export function HelpPanel({ isOpen, onClose }: HelpModalProps): ReactElement | null {
   if (!isOpen) return null;
 
   return (
@@ -43,8 +43,8 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps): ReactElement | n
                 </li>
                 <li>
                   <span className="font-medium text-white">2. Upload Audio</span> — Go to
-                  the Generate tab and upload an audio file (MP3, WAV, FLAC, OGG, M4A, or
-                  AIFF). Maximum file size is 50MB.
+                  the Generate tab and upload an audio file (MP3). Maximum file size is
+                  50MB.
                 </li>
                 <li>
                   <span className="font-medium text-white">3. Analyze</span> — Click the

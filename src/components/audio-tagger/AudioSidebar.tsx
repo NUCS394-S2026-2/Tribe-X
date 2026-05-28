@@ -1,6 +1,6 @@
 import { type ReactElement, useState } from 'react';
 
-import { HelpModal } from './HelpModal';
+import { HelpPanel } from './HelpPanel';
 
 interface AudioSidebarProps {
   activeView?: 'upload' | 'results' | 'history';
@@ -123,7 +123,7 @@ export function AudioSidebar({
         </div>
       </aside>
       {/* Help modal */}
-      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </>
   );
 }

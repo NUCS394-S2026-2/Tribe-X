@@ -1,0 +1,10 @@
+filename,golden_genre,model_genre,golden_bpm,golden_tempo,essentia_bpm,model_tempo,golden_vocals,model_vocals,model_instruments,model_mood,model_lyricThemes,model_soundsLike
+Robert Bismuth - Bar Fly.mp3,Jazz,"Funk, Dance",120.0,Up-tempo,117.5,Up-tempo,No lyrics tag (likely instrumental),Instrumental,"Piano, Bass, Drums","Energetic, Upbeat, Driving, Rhythmic",,"Vulfpeck, Jamiroquai"
+Robert Bismuth - Cycle of Action (1).mp3,Instrumental Orchestral,Electronic,120.0,Up-tempo,60.1,Slow,No lyrics tag (likely instrumental),Instrumental,"Piano, Synth, Bass","Dark, Atmospheric, Dramatic, Intense",,"Trent Reznor & Atticus Ross, Massive Attack"
+Robert Bismuth - Cycle of Action.mp3,Instrumental Orchestral,Electronic,120.0,Up-tempo,60.1,Slow,No lyrics tag (likely instrumental),Instrumental,"Piano, Synth, Bass","Atmospheric, Cinematic, Dark, Dramatic",,"Nils Frahm, Max Richter, Ólafur Arnalds"
+Robert Bismuth - Driving the Way.mp3,Country Pop,"Pop, R&B",114.0,Up-tempo,117.5,Up-tempo,Has lyrics (vocal track),Clean,"Piano, Bass","Upbeat, Energetic, Positive, Catchy",,"Bruno Mars, Anderson .Paak"
+Robert Bismuth - Electronica In Motion.mp3,Electronic Instrumental,"Indie, Rock",120.0,Up-tempo,60.1,Slow,No lyrics tag (likely instrumental),Instrumental,"Piano, Bass, Drums","Cinematic, Dramatic, Intense, Moody",,"Explosions in the Sky, Trent Reznor & Atticus Ross, Mogwai"
+Robert Bismuth - Floating Five.mp3,Jazz,"Electronic, Funk",100.0,Midtempo,99.4,Midtempo,No lyrics tag (likely instrumental),Instrumental,"Keyboard, Bass, Drums","Energetic, Driving, Upbeat, Positive",,"Daft Punk, Disclosure"
+Robert Bismuth - Living the Life.mp3,Jazz,"Electronic, Jazz",92.0,Midtempo,172.3,Fast,Has lyrics (vocal track),Instrumental,"Piano, Bass, Drums","Energetic, Driving, Intense, Rhythmic",,"GoGo Penguin, Floating Points"
+Robert Bismuth - No Time (Alt Rock Hip-Hop Mix).mp3,Singer/Songwriter Hip-Hop Ballad,"Electronic, Dance",—,,184.6,Fast,Has lyrics (vocal track),Instrumental,"Synth, Drums, Bass","Energetic, Driving, Intense, Rhythmic",,"Armin van Buuren, Deadmau5"
+Robert Bismuth - Potential (Indie Pop Mix).mp3,Indie Pop,,82.0,Downtempo,—,,Has lyrics (vocal track),,,,,

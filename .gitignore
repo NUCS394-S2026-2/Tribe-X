@@ -49,3 +49,4 @@ backend/*.xlsx
 backend/outputs/
 audio_to_features_model/outputs/
 audio_to_features_model/*.xlsx
+backend/eval_audio_files/

@@ -1,17 +1,15 @@
-## CS394 2026 Tribe Starter
+# MetaMusic Tag Generator
 
-This repository is the starting point for the second (multi-team) client project in Northwestern CS394. It combines two things:
+MetaMusic Tag Generator is an AI-powered web application that helps your music get discovered and licensed by providing detailed sync licensing metadata.
 
-1. **A Vite + React + TypeScript app template** — the working codebase your tribe will build on.
-2. **A docs-driven agent harness** — a structured `docs/` folder that coordinates both humans and AI coding agents across the tribe.
+![MetaMusic Screenshot](./resources/metamusic-screenshot.png)
 
-### Using this repo
+### Features
 
-The best way to use this is to use the "Use this template" button or use a tool like degit. To use degit:
-
-```bash
-npx degit https://github.com/toddwseattle/tribe-starter#main your-repo-name
-```
+- **Detailed sync licensing metadata**
+- **Industry-standard tag categories**
+- **Confidence score for reliability**
+- **Ready to copy and use**
 
 ### What's in `docs/`
 
@@ -28,20 +26,6 @@ npx degit https://github.com/toddwseattle/tribe-starter#main your-repo-name
 - **[AGENTS.md](AGENTS.md)** — canonical brief for any AI coding agent. Read this before doing anything else.
 - **[CLAUDE.md](CLAUDE.md)** — Claude Code-specific behavior layered on top of the agent brief.
 - **[copilot-instructions.md](copilot-instructions.md)** — GitHub Copilot-specific instructions and tips.
-
-### Getting started with this template
-
-1. Fill in the `ALL_CAPS` placeholders in `docs/tribe/`, `docs/agent/`, `AGENTS.md`, and `CLAUDE.md`. Run `grep -r '[A-Z_]\{4,\}' docs/ AGENTS.md CLAUDE.md` to find them all.
-2. Read [`docs/harness.md`](docs/harness.md) to understand what guides and sensors the template provides.
-3. Form working groups, assign ownership, and start your Iteration 0 spike.
-
----
-
-# Vite + React + TypeScript Template (2026)
-
-The app template targets the 2026 major-version baseline verified in this repository on March 24, 2026.
-
-![394-2026-Screenshot](./resources/2026-screenshot.png)
 
 ## Toolchain Baseline
 

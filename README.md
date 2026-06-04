@@ -1,132 +1,186 @@
 # MetaMusic Tag Generator
 
-# Product Overview
+## Project Overview
 
-MetaMusic Tag Generator is an AI-powered web application that helps your music get discovered and licensed by providing detailed sync licensing metadata.
+MetaMusic Tag Generator is an AI-powered web application built for Robert Bismuth (Solo Hands Music LLC) that automates sync licensing metadata for music tracks. A user uploads an audio file, and the app analyzes it using audio feature extraction and Google's Gemini AI to generate industry-standard Disco sync licensing tags — genre, mood, instruments, vocals, tempo, lyric themes, and artist references.
+
+This saves musicians and music supervisors hours of manual tagging work, making tracks more discoverable on sync licensing platforms.
 
 ![MetaMusic Screenshot](./resources/metamusic-screenshot.png)
 
-### Features
+**Key features:**
 
-- **Detailed sync licensing metadata**
-- **Industry-standard tag categories**
-- **Confidence score for reliability**
-- **Ready to copy and use**
+- Upload MP3, WAV, FLAC, OGG, M4A, or AIFF files (up to 50MB)
+- AI-generated Disco sync licensing tags with confidence score
+- Chat-based tag refinement — describe what you want changed, AI suggests revisions
+- Editable tags — double-click any tag to edit, add, or remove
+- Export tags as CSV or copy to clipboard
+- Analysis history saved to your account
+- Light/dark theme
 
-# Application Link
+---
 
-https://tribe-x.web.app/
+## Application Link
 
-- you must log in through google to begin using the application
+**Live app:** [https://tribe-x.web.app](https://tribe-x.web.app)
 
-# Project Management
+**To use the app:**
 
-Link to the project backlog:
-https://github.com/orgs/NUCS394-S2026-2/projects/5
-We swarmed as a team to generate user stories and added them to the backlog. We then moved each story based on the progress of completion and the priority of the story.
+1. Click **Sign in with Google** — any Google account works
+2. On first load, you will be prompted to enter a **Gemini API key**
+   - Get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+   - The key is stored only in your browser (localStorage) and is never saved to our servers
+3. Upload an audio track and click **Analyze Track**
 
-## Toolchain Baseline
+> The Gemini API key is required for every analysis and chat session. It is sent directly from your browser to our backend with each request and is not stored anywhere server-side.
 
-- Node.js `22+` recommended
-- npm `10+`
-- React `19.2.x`
-- TypeScript `5.9.x`
-- ESLint `9.39.x`
-- Vite `8.0.x`
-- Vitest `4.1.x`
+---
 
-More: [Vite](https://vitejs.dev) · [React](https://reactjs.org/) · [TypeScript](https://www.typescriptlang.org/) · [ESLint](https://eslint.org/) · [Prettier](https://prettier.io/) · [Vitest](https://vitest.dev/) · [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+## Project Management
 
-# Build & Deployment
+**Backlog:** [GitHub Project Board](https://github.com/orgs/NUCS394-S2026-2/projects/5)
 
-## Running the App Locally
+The team used GitHub Projects as the primary project management tool. We swarmed together to generate user stories at the start of the project and added them to the backlog. Stories were prioritized, assigned to sprints, and moved across columns (Backlog → In Progress → Done) as work was completed. Each story had a corresponding spec file in `docs/agent/stories/` that defined acceptance criteria and technical approach before any code was written.
 
-You need two terminals running at the same time — one for the frontend, one for the backend.
+---
 
-### Frontend
+## Build & Deployment
+
+### Prerequisites
+
+- Node.js `22+` and npm `10+`
+- Python `3.9+` (macOS or Linux — see note below)
+- A Firebase project with Auth, Firestore, and Storage enabled
+- A Google Gemini API key (per user — see Application Link section)
+
+> **Windows users:** The backend uses `essentia`, which only has pre-built wheels for macOS and Linux. Use [WSL](https://learn.microsoft.com/en-us/windows/wsl/) on Windows.
+
+---
+
+### Running Locally
+
+You need **two terminals** running simultaneously — one for the frontend, one for the backend.
+
+#### 1. Environment variables
+
+Copy the example env file and fill in your Firebase config values:
+
+```bash
+cp env.example .env
+```
+
+Required values in `.env`:
+
+```
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_ANALYSIS_API_URL=http://localhost:8000
+```
+
+#### 2. Frontend
 
 ```bash
 npm install
 npm run dev
 ```
 
-### Backend (Python analysis server)
+The app runs at `http://localhost:5173`.
+
+#### 3. Backend (Python analysis server)
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+source venv/bin/activate        # Windows (WSL): venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn api:app --reload --port 8000
 ```
 
-The backend runs at `http://localhost:8000`. The frontend is pre-configured to talk to it via the `VITE_ANALYSIS_API_URL` environment variable (defaults to `http://localhost:8000` if not set).
-
-> **Note:** The backend requires Python 3.9+ and `essentia`, which only has pre-built wheels for macOS and Linux. Windows users should use [WSL](https://learn.microsoft.com/en-us/windows/wsl/).
+The backend runs at `http://localhost:8000`. The frontend talks to it via `VITE_ANALYSIS_API_URL`.
 
 ---
 
-## Scripts
+### Deploying to Production
 
-- `npm run dev` — start the Vite dev server
-- `npm run build` — TypeScript compile + production build
-- `npm run type-check` — TypeScript compiler without emitting files
-- `npm run lint` — Prettier + ESLint across the repo
-- `npm test` — Vitest in watch mode
-- `npm test -- --run` — Vitest suite once, no watch
-- `npm run test:ui` — Vitest visual UI (pinned to `127.0.0.1:51204`)
-- `npm run test:coverage` — Vitest with V8 coverage report
+#### Frontend — Firebase Hosting
 
-## Testing
+The frontend is deployed to Firebase Hosting at [tribe-x.web.app](https://tribe-x.web.app).
 
-This template uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+```bash
+npm run build
+firebase deploy --only hosting
+```
 
-**Note:** `npm audit` currently reports GHSA-rf6f-7fwh-wjgh via `flatted`; awaiting an upstream fix in `@vitest/ui` / `flat-cache`. This is a dev-only dependency — do not include `npm audit` of dev dependencies in your CI workflow until this is resolved.
+You will need the Firebase CLI installed (`npm install -g firebase-tools`) and to be logged in (`firebase login`).
 
-Tests live alongside source files (e.g., `src/app.test.tsx` tests `src/App.tsx`).
+#### Backend — Render
 
-**Common queries (priority order):**
+The Python backend is deployed on [Render](https://render.com) using the configuration in `render.yaml`. Deployment is triggered automatically on pushes to `main`. (Corey to edit)
 
-1. `getByRole` — preferred; encourages accessible markup
-2. `getByLabelText`
-3. `getByPlaceholderText`
-4. `getByText`
-5. `getByAltText`
+---
 
-**Test environment** (configured in `vite.config.ts`): jsdom, globals enabled, setup file at `src/test/setup.ts`, V8 coverage with 70% thresholds.
+### Available Scripts
 
-## VS Code Setup
+| Command                 | Description                             |
+| ----------------------- | --------------------------------------- |
+| `npm run dev`           | Start Vite dev server                   |
+| `npm run build`         | TypeScript compile + production build   |
+| `npm run lint`          | Prettier + ESLint across the repo       |
+| `npm test`              | Vitest in watch mode                    |
+| `npm test -- --run`     | Vitest suite once, no watch             |
+| `npm run test:coverage` | Vitest with V8 coverage report          |
+| `npm run type-check`    | TypeScript check without emitting files |
 
-1. Install the ESLint and Prettier extensions.
-2. Enable `formatOnSave`.
-3. Open a `.tsx` file and confirm both are active.
+**Before any PR, run all three:**
 
-## Pre-commit Hook
+```bash
+npm run lint && npm test -- --run && npm run build
+```
 
-Husky runs `npm run lint` on every commit via lint-staged. Running `npm run lint` manually before committing is still the safest way to catch formatting issues early.
+---
 
-## Deployment
+## Additional Information
 
-# Additional Information
+### Architecture
 
-### What's in `docs/`
+The app has three layers:
 
-| Folder                               | Primary reader                     | Purpose                                                             |
-| ------------------------------------ | ---------------------------------- | ------------------------------------------------------------------- |
-| [`docs/tribe/`](docs/tribe/)         | Humans                             | Team practices, client info, branching/naming conventions, backlog  |
-| [`docs/agent/`](docs/agent/)         | Coding agents (and curious humans) | Architecture, design, testing, data model, story specs, ADRs        |
-| [`docs/harness.md`](docs/harness.md) | Everyone                           | Registry of every feedforward guide and feedback sensor in the repo |
+1. **React SPA (frontend)** — TypeScript + Tailwind, deployed on Firebase Hosting. Handles UI, file validation, tag editing, and calls to both the backend API and Firebase directly.
+2. **Python FastAPI backend** — deployed on Render. Receives audio files, runs Essentia + librosa feature extraction, then calls Gemini AI to generate tags. Also handles the chat refinement endpoint.
+3. **Firebase (GCP)** — Firebase Auth (Google OAuth), Firestore (analysis history, user profiles), and Firebase Storage (audio files). The frontend talks to Firebase directly via the Firebase SDK — no backend proxy.
 
-**Rule of thumb:** if its primary reader is a person navigating the project, it goes in `docs/tribe/`. If its primary reader is a model doing a task, it goes in `docs/agent/`. When in doubt, ask the working group that owns development practices.
+Full architecture breakdown: [`ARCHITECTURE_REVIEW.md`](ARCHITECTURE_REVIEW.md)
 
-### Agent entry points
+### Coding Standards
 
-- **[AGENTS.md](AGENTS.md)** — canonical brief for any AI coding agent. Read this before doing anything else.
-- **[CLAUDE.md](CLAUDE.md)** — Claude Code-specific behavior layered on top of the agent brief.
-- **[copilot-instructions.md](copilot-instructions.md)** — GitHub Copilot-specific instructions and tips.
+- TypeScript strict mode is on — no `any` or `@ts-ignore` without an ADR
+- ESLint 9 flat config + Prettier enforced via pre-commit hook (Husky + lint-staged)
+- Firestore is the source of truth — no duplicating Firestore data in local state without caching intent
+- All new features require a story spec in `docs/agent/stories/` before code is written
 
-# Link to Docs
+### Docs Overview
 
-## Acknowledgments
+| Folder                                             | Purpose                                                      |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| [`docs/tribe/`](docs/tribe/)                       | Team practices, client info, branching/naming conventions    |
+| [`docs/agent/`](docs/agent/)                       | Architecture, design, testing, data model, story specs, ADRs |
+| [`docs/harness.md`](docs/harness.md)               | Registry of every guide and sensor in the repo               |
+| [`ARCHITECTURE_REVIEW.md`](ARCHITECTURE_REVIEW.md) | Full code quality and architecture review with findings      |
 
-This template builds on earlier starter work from [theSwordBreaker](https://github.com/TheSwordBreaker/vite-reactts-eslint-prettier) and the React/Vitest teaching materials used in Northwestern CS394.
+---
+
+## Link to Docs
+
+- [Architecture Guide](docs/agent/architecture.md)
+- [Data Model](docs/agent/data-model.md)
+- [Design Guide](docs/agent/design.md)
+- [Testing Guide](docs/agent/testing.md)
+- [Architecture & Code Quality Review](ARCHITECTURE_REVIEW.md)
+- [Product Vision](docs/tribe/Product-Vision.md)
+- [Project Backlog](https://github.com/orgs/NUCS394-S2026-2/projects/5)
+- [Development Practices](docs/tribe/Development-Practices.md)
+- [Branching & Merging](docs/tribe/Approaches-to-Branching-and-Merging.md)

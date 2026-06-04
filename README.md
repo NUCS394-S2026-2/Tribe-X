@@ -1,5 +1,7 @@
 # MetaMusic Tag Generator
 
+# Product Overview
+
 MetaMusic Tag Generator is an AI-powered web application that helps your music get discovered and licensed by providing detailed sync licensing metadata.
 
 ![MetaMusic Screenshot](./resources/metamusic-screenshot.png)
@@ -11,21 +13,17 @@ MetaMusic Tag Generator is an AI-powered web application that helps your music g
 - **Confidence score for reliability**
 - **Ready to copy and use**
 
-### What's in `docs/`
+# Application Link
 
-| Folder                               | Primary reader                     | Purpose                                                             |
-| ------------------------------------ | ---------------------------------- | ------------------------------------------------------------------- |
-| [`docs/tribe/`](docs/tribe/)         | Humans                             | Team practices, client info, branching/naming conventions, backlog  |
-| [`docs/agent/`](docs/agent/)         | Coding agents (and curious humans) | Architecture, design, testing, data model, story specs, ADRs        |
-| [`docs/harness.md`](docs/harness.md) | Everyone                           | Registry of every feedforward guide and feedback sensor in the repo |
+https://tribe-x.web.app/
 
-**Rule of thumb:** if its primary reader is a person navigating the project, it goes in `docs/tribe/`. If its primary reader is a model doing a task, it goes in `docs/agent/`. When in doubt, ask the working group that owns development practices.
+- you must log in through google to begin using the application
 
-### Agent entry points
+# Project Management
 
-- **[AGENTS.md](AGENTS.md)** — canonical brief for any AI coding agent. Read this before doing anything else.
-- **[CLAUDE.md](CLAUDE.md)** — Claude Code-specific behavior layered on top of the agent brief.
-- **[copilot-instructions.md](copilot-instructions.md)** — GitHub Copilot-specific instructions and tips.
+Link to the project backlog:
+https://github.com/orgs/NUCS394-S2026-2/projects/5
+We swarmed as a team to generate user stories and added them to the backlog. We then moved each story based on the progress of completion and the priority of the story.
 
 ## Toolchain Baseline
 
@@ -38,6 +36,8 @@ MetaMusic Tag Generator is an AI-powered web application that helps your music g
 - Vitest `4.1.x`
 
 More: [Vite](https://vitejs.dev) · [React](https://reactjs.org/) · [TypeScript](https://www.typescriptlang.org/) · [ESLint](https://eslint.org/) · [Prettier](https://prettier.io/) · [Vitest](https://vitest.dev/) · [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+
+# Build & Deployment
 
 ## Running the App Locally
 
@@ -104,6 +104,28 @@ Tests live alongside source files (e.g., `src/app.test.tsx` tests `src/App.tsx`)
 ## Pre-commit Hook
 
 Husky runs `npm run lint` on every commit via lint-staged. Running `npm run lint` manually before committing is still the safest way to catch formatting issues early.
+
+## Deployment
+
+# Additional Information
+
+### What's in `docs/`
+
+| Folder                               | Primary reader                     | Purpose                                                             |
+| ------------------------------------ | ---------------------------------- | ------------------------------------------------------------------- |
+| [`docs/tribe/`](docs/tribe/)         | Humans                             | Team practices, client info, branching/naming conventions, backlog  |
+| [`docs/agent/`](docs/agent/)         | Coding agents (and curious humans) | Architecture, design, testing, data model, story specs, ADRs        |
+| [`docs/harness.md`](docs/harness.md) | Everyone                           | Registry of every feedforward guide and feedback sensor in the repo |
+
+**Rule of thumb:** if its primary reader is a person navigating the project, it goes in `docs/tribe/`. If its primary reader is a model doing a task, it goes in `docs/agent/`. When in doubt, ask the working group that owns development practices.
+
+### Agent entry points
+
+- **[AGENTS.md](AGENTS.md)** — canonical brief for any AI coding agent. Read this before doing anything else.
+- **[CLAUDE.md](CLAUDE.md)** — Claude Code-specific behavior layered on top of the agent brief.
+- **[copilot-instructions.md](copilot-instructions.md)** — GitHub Copilot-specific instructions and tips.
+
+# Link to Docs
 
 ## Acknowledgments
 

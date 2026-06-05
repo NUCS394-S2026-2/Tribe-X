@@ -119,8 +119,9 @@ You will need the Firebase CLI installed (`npm install -g firebase-tools`) and t
 
 #### Backend — Render
 
-The Python backend is deployed on [Render](https://render.com) using the configuration in `render.yaml`. Deployment is triggered automatically on pushes to `main`. (Corey to edit)
+The Python backend is deployed on [Render](https://render.com) using the configuration in `render.yaml`. The Render service is named `tribe-x-api`, and deployment is triggered automatically when changes are pushed to `main`.
 
+Render must have the backend environment variables configured in the service settings
 ---
 
 ### Available Scripts
